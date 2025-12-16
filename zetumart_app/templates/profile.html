@@ -1,0 +1,382 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - ZetuMart</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #FF6B35;
+            --primary-dark: #E55A2B;
+            --secondary-color: #2C3E50;
+            --success-color: #27AE60;
+            --light-gray: #F8F9FA;
+            --medium-gray: #E9ECEF;
+            --dark-gray: #6C757D;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+
+        .profile-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            width: 100%;
+            margin: 2rem auto;
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .profile-picture-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+        }
+
+        .profile-picture {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid white;
+            object-fit: cover;
+        }
+
+        .profile-nav {
+            background: var(--light-gray);
+            padding: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .nav-pills .nav-link {
+            color: var(--secondary-color);
+            border-radius: 8px;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-pills .nav-link.active {
+            background: var(--primary-color);
+        }
+
+        .nav-pills .nav-link:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .tab-content {
+            padding: 2rem;
+        }
+
+        .form-control {
+            border: 2px solid var(--medium-gray);
+            border-radius: 8px;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .chat-container {
+            border: 2px solid var(--medium-gray);
+            border-radius: 12px;
+            height: 400px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: var(--light-gray);
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: var(--primary-color);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.admin {
+            background: white;
+            border: 1px solid var(--medium-gray);
+        }
+
+        .coming-soon {
+            text-align: center;
+            padding: 3rem;
+            background: var(--light-gray);
+            border-radius: 12px;
+            color: var(--dark-gray);
+        }
+
+        .coming-soon i {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .back-button-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            transition: all 0.3s ease;
+            border: 2px solid #0056b3;
+        }
+
+        .btn-back:hover {
+            background: #0056b3;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            border-color: #004085;
+        }
+    </style>
+</head>
+<body>
+    <!-- Back Button -->
+    <div class="back-button-container">
+        <a href="{% url 'index' %}" class="btn-back">
+            <i class="bi bi-arrow-left"></i>
+            Back
+        </a>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-picture-container">
+                <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'assets/img/default-avatar.png' %}{% endif %}" alt="Profile Picture" class="profile-picture">
+            </div>
+            <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+            <p class="mb-0">@{{ user.username }}</p>
+        </div>
+
+        <!-- Profile Navigation -->
+        <div class="profile-nav">
+            <ul class="nav nav-pills justify-content-center" id="profileTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">
+                        <i class="bi bi-gear me-2"></i>Settings
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="customer-care-tab" data-bs-toggle="tab" data-bs-target="#customer-care" type="button" role="tab">
+                        <i class="bi bi-headset me-2"></i>Customer Care
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="profileTabContent">
+            <!-- Settings Tab -->
+            <div class="tab-pane fade show active" id="settings" role="tabpanel">
+                <h4 class="mb-4">Profile Settings</h4>
+                <form method="post" action="{% url 'update_profile' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" value="{{ profile.phone }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="3">{{ profile.address }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="profile_picture" class="form-label">Profile Picture</label>
+                        <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/*">
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mb-3">Change Password</h5>
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="new_password" name="new_password">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Save Changes
+                        </button>
+                        <a href="{% url 'logout' %}" class="btn btn-danger">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Customer Care Tab -->
+            <div class="tab-pane fade" id="customer-care" role="tabpanel">
+                <h4 class="mb-4">Customer Care</h4>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="coming-soon">
+                            <i class="bi bi-robot"></i>
+                            <h5>Chat with AI</h5>
+                            <p>Coming Soon!</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-center p-4 border rounded" style="cursor: pointer;" onclick="window.location.href='{% url 'customer_care' %}'">
+                            <i class="bi bi-person-headset" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                            <h5>Chat with Live Agent</h5>
+                            <p>Click to start chatting with our customer support team</p>
+                            <button class="btn btn-primary">
+                                <i class="bi bi-chat-dots me-2"></i>Start Chat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Password confirmation validation
+        document.getElementById('confirm_password').addEventListener('input', function() {
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = this.value;
+            
+            if (newPassword !== confirmPassword && newPassword !== '') {
+                this.setCustomValidity('Passwords do not match');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+</body>
+</html>

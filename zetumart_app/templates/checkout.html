@@ -1,0 +1,1274 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Checkout - ZetuMart Ecommerce</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+
+    <!-- Favicons -->
+    <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+    <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+    <!-- Main CSS File -->
+    <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+    
+    <style>
+        .checkout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .checkout-section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .county-grid {
+            display: none; /* Hide the old grid system */
+        }
+        
+        .search-dropdown {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+        }
+        
+        .search-result-item {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s ease;
+        }
+        
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .selected-item {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            font-weight: 500;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .county-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .county-card:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        .county-card.selected {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+        
+        .payment-method-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-method-card:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        .payment-method-card.selected {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+        
+        .order-summary {
+            position: sticky;
+            top: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .summary-row.total {
+            font-weight: 600;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 15px;
+            margin-top: 15px;
+        }
+        
+        .delivery-time-option {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .delivery-time-option:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        .delivery-time-option.selected {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+        
+        .form-floating label {
+            color: #666;
+        }
+        
+        .btn-checkout {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-checkout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-checkout:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading-spinner {
+            display: none;
+            margin-right: 10px;
+        }
+        
+        .alert-custom {
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .product-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .product-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 15px;
+        }
+        
+        .product-details {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .product-price {
+            color: #666;
+        }
+        
+        .product-quantity {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .delivery-fee-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .estimated-delivery {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header id="header" class="header d-flex align-items-center">
+        <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+            <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+                <h1 class="sitename">ZetuMart</h1>
+            </a>
+
+            <nav id="navmenu" class="navmenu">
+                <ul>
+                    <li><a href="{% url 'index' %}">Home</a></li>
+                    <li><a href="{% url 'products' %}">Products</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'profile' %}">Profile</a></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}">Login</a></li>
+                        <li><a href="{% url 'register' %}">Register</a></li>
+                    {% endif %}
+                </ul>
+                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="page-title" data-aos="fade">
+            <div class="container">
+                <nav class="breadcrumbs">
+                    <ol>
+                        <li><a href="{% url 'index' %}">Home</a></li>
+                        <li class="current">Checkout</li>
+                    </ol>
+                </nav>
+                <h1>Checkout</h1>
+            </div>
+        </div>
+
+        <section id="checkout" class="checkout section">
+            <div class="container">
+                <div class="row">
+                    <!-- Checkout Form -->
+                    <div class="col-lg-8">
+                        <!-- Customer Information -->
+                        <div class="checkout-section">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="section-title mb-0">
+                                    <i class="bi bi-person-fill me-2"></i>
+                                    Customer Information
+                                </h3>
+                                <button type="button" class="btn btn-outline-secondary" onclick="goBack()">
+                                    <i class="bi bi-arrow-left me-2"></i>Back to Shop
+                                </button>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="firstName" placeholder="First Name" required>
+                                        <label for="firstName">First Name *</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="lastName" placeholder="Last Name" required>
+                                        <label for="lastName">Last Name *</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="email" class="form-control" id="email" placeholder="Email" required>
+                                        <label for="email">Email Address *</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="tel" class="form-control" id="phone" placeholder="Phone" pattern="07[0-9]{8}" required>
+                                        <label for="phone">Phone Number *</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Information -->
+                        <div class="checkout-section">
+                            <h3 class="section-title">
+                                <i class="bi bi-truck me-2"></i>
+                                Delivery Information
+                            </h3>
+                            
+                            <!-- County Selection -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Select County *</label>
+                                <div class="search-dropdown">
+                                    <input 
+                                        type="text" 
+                                        class="search-input" 
+                                        id="countySearch" 
+                                        placeholder="Type to search counties..."
+                                        autocomplete="off"
+                                    >
+                                    <div class="search-results" id="countySearchResults"></div>
+                                </div>
+                                <input type="hidden" id="selectedCountyKey" value="">
+                                <input type="hidden" id="selectedCountyName" value="">
+                            </div>
+                            
+                            <!-- Town Selection -->
+                            <div class="mb-4" id="townSection" style="display: none;">
+                                <label class="form-label fw-bold">Select Town/City *</label>
+                                <div class="search-dropdown">
+                                    <input 
+                                        type="text" 
+                                        class="search-input" 
+                                        id="citySearch" 
+                                        placeholder="Type to search cities..."
+                                        autocomplete="off"
+                                        disabled
+                                    >
+                                    <div class="search-results" id="citySearchResults"></div>
+                                </div>
+                                <input type="hidden" id="selectedCityName" value="">
+                                <div class="loading-spinner" id="cityLoadingSpinner">
+                                    <i class="bi bi-arrow-repeat"></i> Loading cities...
+                                </div>
+                            </div>
+                            
+                            <!-- Delivery Point -->
+                            <div class="form-floating mb-3">
+                                <textarea class="form-control" id="deliveryPoint" placeholder="Delivery Point" style="height: 100px" required></textarea>
+                                <label for="deliveryPoint">Specific Delivery Point (Estate, Building Name, Landmark) *</label>
+                            </div>
+                            
+                            <!-- Delivery Method -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Delivery Method *</label>
+                                <div class="delivery-time-option" data-method="home">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="deliveryMethod" id="homeDelivery" value="home" checked>
+                                        <label class="form-check-label" for="homeDelivery">
+                                            <strong>Home Delivery</strong>
+                                            <div class="text-muted small">Delivered to your doorstep</div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="delivery-time-option" data-method="office">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="deliveryMethod" id="officeDelivery" value="office">
+                                        <label class="form-check-label" for="officeDelivery">
+                                            <strong>Office Delivery</strong>
+                                            <div class="text-muted small">Delivered to your office</div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="delivery-time-option" data-method="pickup">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="deliveryMethod" id="pickupStation" value="pickup">
+                                        <label class="form-check-label" for="pickupStation">
+                                            <strong>Pickup Station</strong>
+                                            <div class="text-muted small">Collect from designated pickup point</div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Delivery Time -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Preferred Delivery Time</label>
+                                <select class="form-select" id="deliveryTime">
+                                    <option value="anytime">Anytime</option>
+                                    <option value="morning">Morning (8AM - 12PM)</option>
+                                    <option value="afternoon">Afternoon (12PM - 5PM)</option>
+                                    <option value="evening">Evening (5PM - 8PM)</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Delivery Instructions -->
+                            <div class="form-floating mb-3">
+                                <textarea class="form-control" id="deliveryInstructions" placeholder="Delivery Instructions" style="height: 80px"></textarea>
+                                <label for="deliveryInstructions">Additional Delivery Instructions (Optional)</label>
+                            </div>
+                            
+                            <!-- Delivery Fee Info -->
+                            <div class="delivery-fee-info" id="deliveryFeeInfo">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span><strong>Delivery Fee:</strong></span>
+                                    <span id="deliveryFeeAmount">KSh 0</span>
+                                </div>
+                                <div class="estimated-delivery mt-2" id="estimatedDelivery">
+                                    Select delivery location to see estimated delivery time
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="checkout-section">
+                            <h3 class="section-title">
+                                <i class="bi bi-credit-card me-2"></i>
+                                Payment Method
+                            </h3>
+                            
+                            <div id="paymentMethods">
+                                <!-- M-Pesa STK Push -->
+                                <div class="payment-method-card" data-method="mpesa">
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" name="paymentMethod" id="mpesaStk" value="mpesa" class="form-check-input me-3">
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">M-Pesa STK Push</h5>
+                                            <p class="mb-0 text-muted">Pay via M-Pesa on your mobile phone</p>
+                                        </div>
+                                        <i class="bi bi-phone fs-3 text-success"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- M-Pesa Till/PayBill -->
+                                <div class="payment-method-card" data-method="till">
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" name="paymentMethod" id="mpesaTill" value="till" class="form-check-input me-3">
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">M-Pesa Till/PayBill</h5>
+                                            <p class="mb-0 text-muted">Manual payment via Till or PayBill number</p>
+                                        </div>
+                                        <i class="bi bi-receipt fs-3 text-primary"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Pay on Delivery -->
+                                <div class="payment-method-card" data-method="cod">
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" name="paymentMethod" id="payOnDelivery" value="cod" class="form-check-input me-3">
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">Pay on Delivery</h5>
+                                            <p class="mb-0 text-muted">Cash payment when you receive your order</p>
+                                        </div>
+                                        <i class="bi bi-cash fs-3 text-warning"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Lipa Mdogo Mdogo -->
+                                <div class="payment-method-card" data-method="polepole">
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" name="paymentMethod" id="lipaMdogo" value="polepole" class="form-check-input me-3">
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">Lipa Mdogo Mdogo</h5>
+                                            <p class="mb-0 text-muted">Pay in flexible installments</p>
+                                        </div>
+                                        <i class="bi bi-calendar-check fs-3 text-info"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Card Payment -->
+                                <div class="payment-method-card" data-method="card">
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" name="paymentMethod" id="cardPayment" value="card" class="form-check-input me-3">
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">Debit/Credit Card</h5>
+                                            <p class="mb-0 text-muted">Visa & MasterCard accepted</p>
+                                        </div>
+                                        <i class="bi bi-credit-card-2-front fs-3 text-danger"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- PayPal -->
+                                <div class="payment-method-card" data-method="paypal">
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" name="paymentMethod" id="paypalPayment" value="paypal" class="form-check-input me-3">
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">PayPal</h5>
+                                            <p class="mb-0 text-muted">International payments</p>
+                                        </div>
+                                        <i class="bi bi-paypal fs-3 text-primary"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Payment Details (shown based on selection) -->
+                            <div id="paymentDetails" style="display: none;">
+                                <!-- Payment details will be populated based on selection -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="col-lg-4">
+                        <div class="order-summary checkout-section">
+                            <h3 class="section-title">
+                                <i class="bi bi-cart-check me-2"></i>
+                                Order Summary
+                            </h3>
+                            
+                            <div id="orderItems">
+                                <!-- Cart items will be populated by JavaScript -->
+                            </div>
+                            
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">KSh 0</span>
+                            </div>
+                            
+                            <div class="summary-row">
+                                <span>Delivery Fee:</span>
+                                <span id="deliveryFee">KSh 0</span>
+                            </div>
+                            
+                            <div class="summary-row total">
+                                <span>Total:</span>
+                                <span id="totalAmount">KSh 0</span>
+                            </div>
+                            
+                            <button class="btn btn-checkout mt-4" id="placeOrderBtn" disabled>
+                                <span class="loading-spinner">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </span>
+                                Place Order
+                            </button>
+                            
+                            <div class="alert alert-info mt-3" id="checkoutAlert" style="display: none;">
+                                <!-- Alert messages will be shown here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer" class="footer">
+        <div class="container footer-top">
+            <div class="row gy-4">
+                <div class="col-lg-4 col-md-12 footer-about">
+                    <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+                        <span class="sitename">ZetuMart</span>
+                    </a>
+                    <p>Your trusted online shopping destination in Kenya.</p>
+                </div>
+                
+                <div class="col-lg-4 col-md-12 footer-contact text-center">
+                    <h4>Contact Us</h4>
+                    <p>Phone: +254 700 000000</p>
+                    <p>Email: info@zetumart.co.ke</p>
+                </div>
+                
+                <div class="col-lg-4 col-md-12 footer-links">
+                    <h4>Useful Links</h4>
+                    <ul>
+                        <li><a href="{% url 'index' %}">Home</a></li>
+                        <li><a href="{% url 'products' %}">Products</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="{% url 'customer_care' %}">Customer Care</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="copyright">
+                &copy; 2024 ZetuMart. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Vendor JS Files -->
+    <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+    <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+    <!-- Main JS File -->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+    
+    <!-- Checkout JavaScript -->
+    <script>
+        // Dynamic Delivery System
+        let selectedCountyKey = '';
+        let selectedCountyName = '';
+        let selectedCityName = '';
+        let cartItems = [];
+        let subtotal = 0;
+        let deliveryFee = 0;
+        let totalAmount = 0;
+        let deliveryInfo = null;
+
+        // Initialize checkout
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCartItems();
+            setupDeliverySearch();
+            setupEventListeners();
+            updateOrderSummary();
+        });
+
+        // Setup delivery search functionality
+        function setupDeliverySearch() {
+            const countySearch = document.getElementById('countySearch');
+            const citySearch = document.getElementById('citySearch');
+            const countyResults = document.getElementById('countySearchResults');
+            const cityResults = document.getElementById('citySearchResults');
+            
+            // County search
+            let countySearchTimeout;
+            countySearch.addEventListener('input', function() {
+                clearTimeout(countySearchTimeout);
+                const query = this.value.trim();
+                
+                if (query.length < 2) {
+                    countyResults.style.display = 'none';
+                    return;
+                }
+                
+                countySearchTimeout = setTimeout(() => {
+                    searchCounties(query);
+                }, 300);
+            });
+            
+            // City search
+            let citySearchTimeout;
+            citySearch.addEventListener('input', function() {
+                clearTimeout(citySearchTimeout);
+                const query = this.value.trim();
+                
+                if (query.length < 2 || !selectedCountyKey) {
+                    cityResults.style.display = 'none';
+                    return;
+                }
+                
+                citySearchTimeout = setTimeout(() => {
+                    searchCities(selectedCountyKey, query);
+                }, 300);
+            });
+            
+            // Close search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-dropdown')) {
+                    countyResults.style.display = 'none';
+                    cityResults.style.display = 'none';
+                }
+            });
+        }
+        
+        // Search counties
+        async function searchCounties(query) {
+            try {
+                const response = await fetch(`/api/delivery/search-counties/?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayCountyResults(data.counties);
+                }
+            } catch (error) {
+                console.error('Error searching counties:', error);
+            }
+        }
+        
+        // Search cities
+        async function searchCities(countyKey, query) {
+            try {
+                const response = await fetch(`/api/delivery/get-cities/?county=${encodeURIComponent(countyKey)}&q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayCityResults(data.cities);
+                }
+            } catch (error) {
+                console.error('Error searching cities:', error);
+            }
+        }
+        
+        // Display county search results
+        function displayCountyResults(counties) {
+            const resultsContainer = document.getElementById('countySearchResults');
+            resultsContainer.innerHTML = '';
+            
+            if (counties.length === 0) {
+                resultsContainer.innerHTML = '<div class="search-result-item">No counties found</div>';
+            } else {
+                counties.forEach(county => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.textContent = county.display_name;
+                    item.addEventListener('click', () => selectCounty(county.key, county.display_name));
+                    resultsContainer.appendChild(item);
+                });
+            }
+            
+            resultsContainer.style.display = 'block';
+        }
+        
+        // Display city search results
+        function displayCityResults(cities) {
+            const resultsContainer = document.getElementById('citySearchResults');
+            resultsContainer.innerHTML = '';
+            
+            if (cities.length === 0) {
+                resultsContainer.innerHTML = '<div class="search-result-item">No cities found</div>';
+            } else {
+                cities.forEach(city => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.textContent = city;
+                    item.addEventListener('click', () => selectCity(city));
+                    resultsContainer.appendChild(item);
+                });
+            }
+            
+            resultsContainer.style.display = 'block';
+        }
+        
+        // Select county
+        async function selectCounty(countyKey, countyName) {
+            selectedCountyKey = countyKey;
+            selectedCountyName = countyName;
+            
+            // Update UI
+            document.getElementById('countySearch').value = countyName;
+            document.getElementById('selectedCountyKey').value = countyKey;
+            document.getElementById('selectedCountyName').value = countyName;
+            document.getElementById('countySearchResults').style.display = 'none';
+            
+            // Clear city selection
+            selectedCityName = '';
+            document.getElementById('citySearch').value = '';
+            document.getElementById('selectedCityName').value = '';
+            document.getElementById('citySearchResults').style.display = 'none';
+            
+            // Show town section and enable city search
+            document.getElementById('townSection').style.display = 'block';
+            document.getElementById('citySearch').disabled = false;
+            document.getElementById('cityLoadingSpinner').style.display = 'block';
+            
+            // Load cities for this county
+            try {
+                const response = await fetch(`/api/delivery/get-cities/?county=${encodeURIComponent(countyKey)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Store cities for future reference
+                    window.currentCities = data.cities;
+                }
+            } catch (error) {
+                console.error('Error loading cities:', error);
+            } finally {
+                document.getElementById('cityLoadingSpinner').style.display = 'none';
+            }
+            
+            // Reset delivery info
+            deliveryInfo = null;
+            updateDeliveryInfo();
+        }
+        
+        // Select city
+        async function selectCity(cityName) {
+            selectedCityName = cityName;
+            
+            // Update UI
+            document.getElementById('citySearch').value = cityName;
+            document.getElementById('selectedCityName').value = cityName;
+            document.getElementById('citySearchResults').style.display = 'none';
+            
+            // Get delivery information
+            await updateDeliveryInfo();
+        }
+        
+        // Update delivery information
+        async function updateDeliveryInfo() {
+            if (!selectedCountyKey || !selectedCityName) {
+                deliveryFee = 0;
+                document.getElementById('deliveryFeeAmount').textContent = 'KSh 0';
+                document.getElementById('estimatedDelivery').textContent = 'Select delivery location to see estimated delivery time';
+                updateOrderSummary();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/delivery/get-info/?county=${encodeURIComponent(selectedCountyKey)}&city=${encodeURIComponent(selectedCityName)}&order_amount=${subtotal}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    deliveryInfo = data.delivery_info;
+                    deliveryFee = data.delivery_fee;
+                    
+                    // Update UI
+                    document.getElementById('deliveryFeeAmount').textContent = `KSh ${deliveryFee.toLocaleString()}`;
+                    
+                    const estimatedDate = new Date(data.estimated_date);
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    document.getElementById('estimatedDelivery').textContent = `Estimated delivery: ${estimatedDate.toLocaleDateString('en-US', options)}`;
+                    
+                    updateOrderSummary();
+                }
+            } catch (error) {
+                console.error('Error getting delivery info:', error);
+            }
+        }
+
+        // Load cart items from localStorage
+        function loadCartItems() {
+            try {
+                cartItems = JSON.parse(localStorage.getItem('zetumart_cart_v1') || '[]');
+                
+                // Check if cart is empty
+                if (cartItems.length === 0) {
+                    showAlert('Your cart is empty. Please add items before checkout.', 'warning');
+                    // Redirect to home page after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 3000);
+                    return;
+                }
+                
+                renderCartItems();
+            } catch (error) {
+                console.error('Error loading cart:', error);
+                showAlert('Error loading cart items', 'danger');
+            }
+        }
+
+        // Render cart items in order summary
+        function renderCartItems() {
+            const container = document.getElementById('orderItems');
+            container.innerHTML = '';
+            
+            if (cartItems.length === 0) {
+                container.innerHTML = '<p class="text-muted">Your cart is empty</p>';
+                return;
+            }
+            
+            subtotal = 0;
+            
+            cartItems.forEach(item => {
+                const itemTotal = (item.price || 0) * (item.qty || 1);
+                subtotal += itemTotal;
+                
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'product-item';
+                itemDiv.innerHTML = `
+                    <img src="${item.image || '/static/assets/img/product-placeholder.jpg'}" alt="${item.name}">
+                    <div class="product-details">
+                        <div class="product-name">${item.name}</div>
+                        <div class="product-price">KSh ${(item.price || 0).toLocaleString()}</div>
+                        <div class="product-quantity">Quantity: ${item.qty || 1}</div>
+                    </div>
+                    <div class="product-total">
+                        <strong>KSh ${itemTotal.toLocaleString()}</strong>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Delivery method selection
+            document.querySelectorAll('input[name="deliveryMethod"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.querySelectorAll('.delivery-time-option').forEach(option => {
+                        option.classList.remove('selected');
+                    });
+                    this.closest('.delivery-time-option').classList.add('selected');
+                    validateForm();
+                });
+            });
+            
+            // Payment method selection
+            document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.querySelectorAll('.payment-method-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    this.closest('.payment-method-card').classList.add('selected');
+                    showPaymentDetails(this.value);
+                    validateForm();
+                });
+            });
+            
+            // Form validation
+            const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'deliveryPoint'];
+            requiredFields.forEach(fieldId => {
+                document.getElementById(fieldId).addEventListener('input', validateForm);
+            });
+            
+            // Add delivery fields to validation
+            document.getElementById('countySearch').addEventListener('input', validateForm);
+            document.getElementById('citySearch').addEventListener('input', validateForm);
+            
+            // Place order button
+            document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
+        }
+
+        // Show payment details based on method
+        function showPaymentDetails(method) {
+            const container = document.getElementById('paymentDetails');
+            container.style.display = 'block';
+            container.innerHTML = '';
+            
+            switch(method) {
+                case 'mpesa':
+                    container.innerHTML = `
+                        <div class="alert alert-info">
+                            <h6>M-Pesa STK Push Payment</h6>
+                            <p>You will receive an M-Pesa prompt on your phone to complete payment.</p>
+                            <div class="form-floating mb-3">
+                                <input type="tel" class="form-control" id="mpesaPhone" placeholder="M-Pesa Phone" pattern="07[0-9]{8}" required>
+                                <label for="mpesaPhone">M-Pesa Phone Number *</label>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'till':
+                    container.innerHTML = `
+                        <div class="alert alert-info">
+                            <h6>M-Pesa Till/PayBill Payment</h6>
+                            <p><strong>Till Number:</strong> 123456</p>
+                            <p><strong>PayBill Number:</strong> 123456</p>
+                            <p><strong>Account Number:</strong> Your order ID</p>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="transactionCode" placeholder="Transaction Code" required>
+                                <label for="transactionCode">M-Pesa Transaction Code *</label>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'polepole':
+                    container.innerHTML = `
+                        <div class="alert alert-info">
+                            <h6>Lipa Mdogo Mdogo - Flexible Installments</h6>
+                            <p>Pay in convenient installments:</p>
+                            <ul>
+                                <li>30% upfront (KSh ${Math.round(totalAmount * 0.3).toLocaleString()})</li>
+                                <li>Remaining 70% split over 3 months</li>
+                                <li>Monthly payment: KSh ${Math.round(totalAmount * 0.7 / 3).toLocaleString()}</li>
+                            </ul>
+                            <div class="form-floating mb-3">
+                                <select class="form-select" id="installmentPlan">
+                                    <option value="3months">3 Months</option>
+                                    <option value="6months">6 Months</option>
+                                    <option value="12months">12 Months</option>
+                                </select>
+                                <label for="installmentPlan">Installment Plan</label>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'card':
+                    container.innerHTML = `
+                        <div class="alert alert-info">
+                            <h6>Card Payment</h6>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="cardNumber" placeholder="Card Number" maxlength="19" required>
+                                        <label for="cardNumber">Card Number *</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" maxlength="5" required>
+                                        <label for="expiryDate">Expiry Date *</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="cvv" placeholder="CVV" maxlength="4" required>
+                                        <label for="cvv">CVV *</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'paypal':
+                    container.innerHTML = `
+                        <div class="alert alert-info">
+                            <h6>PayPal Payment</h6>
+                            <p>You will be redirected to PayPal to complete your payment.</p>
+                            <p>PayPal accepts Visa, MasterCard, and international payment methods.</p>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'cod':
+                    container.innerHTML = `
+                        <div class="alert alert-warning">
+                            <h6>Pay on Delivery</h6>
+                            <p>Please have the exact amount ready when your order arrives.</p>
+                            <p>Delivery person will accept cash only.</p>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+
+        // Update order summary
+        function updateOrderSummary() {
+            document.getElementById('subtotal').textContent = `KSh ${subtotal.toLocaleString()}`;
+            document.getElementById('deliveryFee').textContent = `KSh ${deliveryFee.toLocaleString()}`;
+            totalAmount = subtotal + deliveryFee;
+            document.getElementById('total').textContent = `KSh ${totalAmount.toLocaleString()}`;
+        }
+
+        // Show alert
+        function showAlert(message, type = 'info') {
+            const alert = document.getElementById('checkoutAlert');
+            alert.className = `alert alert-${type} alert-custom`;
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Validate form
+        function validateForm() {
+            let isValid = true;
+            
+            // Check customer info fields
+            const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'deliveryPoint'];
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    isValid = false;
+                }
+            });
+            
+            // Check delivery location
+            if (!selectedCountyKey || !selectedCityName) {
+                isValid = false;
+            }
+            
+            // Check payment method
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+            if (!paymentMethod) {
+                isValid = false;
+            }
+            
+            // Check if cart has items
+            if (cartItems.length === 0) {
+                isValid = false;
+            }
+            
+            document.getElementById('placeOrderBtn').disabled = !isValid;
+            return isValid;
+        }
+
+        // Place order
+        async function placeOrder() {
+            if (!validateForm()) {
+                showAlert('Please fill in all required fields', 'danger');
+                return;
+            }
+            
+            const btn = document.getElementById('placeOrderBtn');
+            const spinner = btn.querySelector('.loading-spinner');
+            
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            
+            try {
+                const orderData = {
+                    customer_name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
+                    customer_email: document.getElementById('email').value,
+                    customer_phone: document.getElementById('phone').value,
+                    items: cartItems,
+                    subtotal: subtotal,
+                    delivery_fee: deliveryFee,
+                    total: totalAmount,
+                    delivery: {
+                        county: selectedCountyName,
+                        county_key: selectedCountyKey,
+                        town: selectedCityName,
+                        point: document.getElementById('deliveryPoint').value,
+                        method: document.querySelector('input[name="deliveryMethod"]:checked').value,
+                        time: document.getElementById('deliveryTime').value,
+                        instructions: document.getElementById('deliveryInstructions').value
+                    },
+                    payment_method: document.querySelector('input[name="paymentMethod"]:checked').value,
+                    payment_details: getPaymentDetails()
+                };
+                
+                const response = await fetch('/api/orders/create/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(orderData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Clear cart
+                    localStorage.setItem('zetumart_cart_v1', '[]');
+                    
+                    // Show success message
+                    showAlert(`Order placed successfully! Order ID: ${result.order_id}`, 'success');
+                    
+                    // Redirect to order confirmation page
+                    setTimeout(() => {
+                        window.location.href = `/order-confirmation/${result.order_id}/`;
+                    }, 2000);
+                } else {
+                    showAlert(result.error || 'Failed to place order', 'danger');
+                }
+            } catch (error) {
+                console.error('Order error:', error);
+                showAlert('Failed to place order. Please try again.', 'danger');
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        }
+
+        // Get payment details based on selected method
+        function getPaymentDetails() {
+            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const details = {};
+            
+            switch(method) {
+                case 'mpesa':
+                    details.phone = document.getElementById('mpesaPhone')?.value;
+                    break;
+                case 'till':
+                    details.transaction_code = document.getElementById('transactionCode')?.value;
+                    break;
+                case 'polepole':
+                    details.installment_plan = document.getElementById('installmentPlan')?.value;
+                    break;
+                case 'card':
+                    details.card_number = document.getElementById('cardNumber')?.value;
+                    details.expiry_date = document.getElementById('expiryDate')?.value;
+                    break;
+            }
+            
+            return details;
+        }
+
+        // Get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Format card number input
+        document.addEventListener('input', function(e) {
+            if (e.target && e.target.id === 'cardNumber') {
+                let value = e.target.value.replace(/\s/g, '');
+                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                e.target.value = formattedValue;
+            }
+        });
+
+        // Format expiry date input
+        document.addEventListener('input', function(e) {
+            if (e.target && e.target.id === 'expiryDate') {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                }
+                e.target.value = value;
+            }
+        });
+
+        // Go back to shop function
+        function goBack() {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - ZetuMart</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #FF6B35;
+            --primary-dark: #E55A2B;
+            --secondary-color: #2C3E50;
+            --success-color: #27AE60;
+            --light-gray: #F8F9FA;
+            --medium-gray: #E9ECEF;
+            --dark-gray: #6C757D;
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+
+        .notifications-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            margin: 2rem auto;
+            overflow: hidden;
+        }
+
+        .notifications-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .notification-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--medium-gray);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .notification-item:hover {
+            background: var(--light-gray);
+        }
+
+        .notification-item.unread {
+            background: rgba(255, 107, 53, 0.05);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-right: 1rem;
+        }
+
+        .notification-icon.info {
+            background: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+        }
+
+        .notification-icon.success {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+
+        .notification-icon.warning {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .notification-icon.message {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--primary-color);
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-message {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+        }
+
+        .empty-notifications {
+            text-align: center;
+            padding: 3rem;
+            color: var(--dark-gray);
+        }
+
+        .empty-notifications i {
+            font-size: 4rem;
+            color: var(--medium-gray);
+            margin-bottom: 1rem;
+        }
+
+        .back-button-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            transition: all 0.3s ease;
+            border: 2px solid #0056b3;
+        }
+
+        .btn-back:hover {
+            background: #0056b3;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            border-color: #004085;
+        }
+
+        .mark-all-read {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .mark-all-read:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Back Button -->
+    <div class="back-button-container">
+        <a href="{% url 'profile' %}" class="btn-back">
+            <i class="bi bi-arrow-left"></i>
+            Back to Profile
+        </a>
+    </div>
+
+    <div class="notifications-container">
+        <!-- Header -->
+        <div class="notifications-header">
+            <h2><i class="bi bi-bell me-2"></i>Notifications</h2>
+            <p class="mb-0">Stay updated with your account activity</p>
+        </div>
+
+        <!-- Notifications List -->
+        <div id="notificationsList">
+            {% if notifications %}
+                <div class="p-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ notifications.count }} Notifications</h5>
+                    <button class="mark-all-read" onclick="markAllAsRead()">
+                        <i class="bi bi-check-all me-1"></i>Mark All as Read
+                    </button>
+                </div>
+                
+                {% for notification in notifications %}
+                    <div class="notification-item {% if not notification.is_read %}unread{% endif %}" onclick="markAsRead('{{ notification.id }}')">
+                        <div class="d-flex align-items-start">
+                            <div class="notification-icon {% if 'reply' in notification.message %}message{% elif 'success' in notification.message|lower %}success{% elif 'warning' in notification.message|lower %}warning{% else %}info{% endif %}">
+                                <i class="bi {% if 'reply' in notification.message %}bi-chat-dots{% elif 'success' in notification.message|lower %}bi-check-circle{% elif 'warning' in notification.message|lower %}bi-exclamation-triangle{% else %}bi-info-circle{% endif %}"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-title">
+                                    {% if 'reply' in notification.message %}
+                                        Admin Reply
+                                    {% elif 'success' in notification.message|lower %}
+                                        Success
+                                    {% elif 'warning' in notification.message|lower %}
+                                        Important Notice
+                                    {% else %}
+                                        Information
+                                    {% endif %}
+                                </div>
+                                <div class="notification-message">
+                                    {{ notification.message }}
+                                </div>
+                                <div class="notification-time">
+                                    <i class="bi bi-clock me-1"></i>
+                                    {{ notification.created_at|timesince }} ago
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-notifications">
+                    <i class="bi bi-bell-slash"></i>
+                    <h5>No Notifications</h5>
+                    <p>You're all caught up! No new notifications at the moment.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function markAsRead(notificationId) {
+            // Convert string to number if needed
+            const id = parseInt(notificationId);
+            // In a real application, this would make an AJAX call to mark as read
+            const notificationItem = event.currentTarget;
+            notificationItem.classList.remove('unread');
+            
+            // Update notification badge count
+            updateNotificationBadge();
+        }
+
+        function markAllAsRead() {
+            // Remove unread class from all notifications
+            const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+            unreadNotifications.forEach(item => {
+                item.classList.remove('unread');
+            });
+            
+            // Update notification badge count
+            updateNotificationBadge();
+            
+            // Show success message
+            showSuccessMessage();
+        }
+
+        function updateNotificationBadge() {
+            // Update the notification badge in the profile tab
+            const badge = document.querySelector('.notification-badge');
+            if (badge) {
+                const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
+        function showSuccessMessage() {
+            // Create and show a success message
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+            alert.innerHTML = `
+                <i class="bi bi-check-circle me-2"></i>
+                All notifications marked as read!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        // Initialize notification badge
+        updateNotificationBadge();
+    </script>
+</body>
+</html>

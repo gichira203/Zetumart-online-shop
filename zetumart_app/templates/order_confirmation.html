@@ -1,0 +1,707 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Order Confirmation - ZetuMart Ecommerce</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+
+    <!-- Favicons -->
+    <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+    <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
+
+    <!-- Main CSS File -->
+    <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+    
+    <style>
+        .confirmation-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        
+        .order-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .order-id {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .order-status {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #28a745;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-label {
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .product-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .product-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+        
+        .product-details {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .product-price {
+            color: #666;
+        }
+        
+        .product-quantity {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .timeline-content {
+            flex: 1;
+        }
+        
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-time {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn-action {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-custom {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary-custom:hover {
+            background: #2980b9;
+            color: white;
+        }
+        
+        .btn-secondary-custom {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary-custom:hover {
+            background: #5a6268;
+            color: white;
+        }
+        
+        .estimated-delivery {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .payment-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .payment-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .payment-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .payment-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header id="header" class="header d-flex align-items-center">
+        <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+            <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+                <h1 class="sitename">ZetuMart</h1>
+            </a>
+
+            <nav id="navmenu" class="navmenu">
+                <ul>
+                    <li><a href="{% url 'index' %}">Home</a></li>
+                    <li><a href="{% url 'products' %}">Products</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'profile' %}">Profile</a></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}">Login</a></li>
+                        <li><a href="{% url 'register' %}">Register</a></li>
+                    {% endif %}
+                </ul>
+                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="page-title" data-aos="fade">
+            <div class="container">
+                <nav class="breadcrumbs">
+                    <ol>
+                        <li><a href="{% url 'index' %}">Home</a></li>
+                        <li><a href="{% url 'checkout' %}">Checkout</a></li>
+                        <li class="current">Order Confirmation</li>
+                    </ol>
+                </nav>
+                <h1>Order Confirmation</h1>
+            </div>
+        </div>
+
+        <section id="order-confirmation" class="section">
+            <div class="container">
+                <div class="confirmation-container">
+                    <!-- Success Message -->
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="success-icon">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <h2>Order Placed Successfully!</h2>
+                            <p class="text-muted">Thank you for your order. We've received your order and will begin processing it shortly.</p>
+                        </div>
+
+                        <!-- Order Information -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="section-title">Order Details</h5>
+                                <div class="info-row">
+                                    <span class="info-label">Order ID:</span>
+                                    <span class="info-value" id="orderId">{{ order_id }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Order Date:</span>
+                                    <span class="info-value" id="orderDate">{{ order_date }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Order Status:</span>
+                                    <span class="order-status">Confirmed</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Payment Method:</span>
+                                    <span class="info-value" id="paymentMethod">{{ payment_method }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Payment Status:</span>
+                                    <span class="payment-status payment-pending" id="paymentStatus">Pending</span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5 class="section-title">Delivery Information</h5>
+                                <div class="info-row">
+                                    <span class="info-label">County:</span>
+                                    <span class="info-value" id="deliveryCounty">{{ delivery_county }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Town/City:</span>
+                                    <span class="info-value" id="deliveryTown">{{ delivery_town }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Delivery Method:</span>
+                                    <span class="info-value" id="deliveryMethod">{{ delivery_method }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Delivery Point:</span>
+                                    <span class="info-value" id="deliveryPoint">{{ delivery_point }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Estimated Delivery -->
+                        <div class="estimated-delivery mt-4">
+                            <i class="bi bi-truck me-2"></i>
+                            <strong>Estimated Delivery:</strong> <span id="estimatedDelivery">{{ estimated_delivery }}</span>
+                        </div>
+
+                        <!-- Order Items -->
+                        <h5 class="section-title mt-4">Order Items</h5>
+                        <div id="orderItems">
+                            <!-- Items will be populated by JavaScript -->
+                        </div>
+
+                        <!-- Order Summary -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <h5 class="section-title">Order Summary</h5>
+                                <div class="info-row">
+                                    <span class="info-label">Subtotal:</span>
+                                    <span class="info-value" id="subtotal">KSh 0</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Delivery Fee:</span>
+                                    <span class="info-value" id="deliveryFee">KSh 0</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Total Amount:</span>
+                                    <span class="info-value" id="totalAmount">KSh 0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5 class="section-title">Customer Information</h5>
+                                <div class="info-row">
+                                    <span class="info-label">Name:</span>
+                                    <span class="info-value" id="customerName">{{ customer_name }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Email:</span>
+                                    <span class="info-value" id="customerEmail">{{ customer_email }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Phone:</span>
+                                    <span class="info-value" id="customerPhone">{{ customer_phone }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Timeline -->
+                        <h5 class="section-title mt-4">Order Timeline</h5>
+                        <div class="timeline" id="orderTimeline">
+                            <div class="timeline-item">
+                                <div class="timeline-icon">
+                                    <i class="bi bi-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-title">Order Confirmed</div>
+                                    <div class="timeline-time">Just now</div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-icon">
+                                    <i class="bi bi-box-seam"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-title">Processing</div>
+                                    <div class="timeline-time">Expected within 2 hours</div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-icon">
+                                    <i class="bi bi-truck"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-title">Out for Delivery</div>
+                                    <div class="timeline-time">Expected tomorrow</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <a href="{% url 'index' %}" class="btn-action btn-primary-custom">
+                                <i class="bi bi-house me-2"></i>
+                                Continue Shopping
+                            </a>
+                            <a href="{% url 'profile' %}" class="btn-action btn-secondary-custom">
+                                <i class="bi bi-person me-2"></i>
+                                View My Orders
+                            </a>
+                            <a href="{% url 'customer_care' %}" class="btn-action btn-secondary-custom">
+                                <i class="bi bi-chat-dots me-2"></i>
+                                Contact Support
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer" class="footer">
+        <div class="container footer-top">
+            <div class="row gy-4">
+                <div class="col-lg-4 col-md-12 footer-about">
+                    <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+                        <span class="sitename">ZetuMart</span>
+                    </a>
+                    <p>Your trusted online shopping destination in Kenya.</p>
+                </div>
+                
+                <div class="col-lg-4 col-md-12 footer-contact text-center">
+                    <h4>Contact Us</h4>
+                    <p>Phone: +254 700 000000</p>
+                    <p>Email: info@zetumart.co.ke</p>
+                </div>
+                
+                <div class="col-lg-4 col-md-12 footer-links">
+                    <h4>Useful Links</h4>
+                    <ul>
+                        <li><a href="{% url 'index' %}">Home</a></li>
+                        <li><a href="{% url 'products' %}">Products</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="{% url 'customer_care' %}">Customer Care</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="copyright">
+                &copy; 2024 ZetuMart. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Vendor JS Files -->
+    <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+
+    <!-- Main JS File -->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+    
+    <!-- Order Confirmation JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load order details from URL parameters or localStorage
+            loadOrderDetails();
+            
+            // Check payment status periodically for certain payment methods
+            checkPaymentStatus();
+        });
+
+        function loadOrderDetails() {
+            // Get order details from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('order_id') || localStorage.getItem('last_order_id');
+            
+            if (orderId) {
+                document.getElementById('orderId').textContent = orderId;
+                
+                // Load order details from API
+                fetch(`/api/orders/${orderId}/details/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            populateOrderDetails(data.order);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading order:', error);
+                    });
+            }
+            
+            // Load cart items for display
+            loadCartItems();
+        }
+
+        function loadCartItems() {
+            try {
+                const cartItems = JSON.parse(localStorage.getItem('zetumart_cart_v1') || '[]');
+                const container = document.getElementById('orderItems');
+                container.innerHTML = '';
+                
+                if (cartItems.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No items in cart</p>';
+                    return;
+                }
+                
+                let subtotal = 0;
+                
+                cartItems.forEach(item => {
+                    const itemTotal = (item.price || 0) * (item.qty || 1);
+                    subtotal += itemTotal;
+                    
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'product-item';
+                    itemDiv.innerHTML = `
+                        <img src="${item.image || '/static/assets/img/product-placeholder.jpg'}" alt="${item.name}">
+                        <div class="product-details">
+                            <div class="product-name">${item.name}</div>
+                            <div class="product-price">KSh ${(item.price || 0).toLocaleString()}</div>
+                            <div class="product-quantity">Quantity: ${item.qty || 1}</div>
+                        </div>
+                        <div class="product-total">
+                            <strong>KSh ${itemTotal.toLocaleString()}</strong>
+                        </div>
+                    `;
+                    container.appendChild(itemDiv);
+                });
+                
+                // Update summary
+                document.getElementById('subtotal').textContent = `KSh ${subtotal.toLocaleString()}`;
+                
+                // Get delivery fee from URL or calculate
+                const deliveryFee = parseInt(new URLSearchParams(window.location.search).get('delivery_fee') || '0');
+                document.getElementById('deliveryFee').textContent = `KSh ${deliveryFee.toLocaleString()}`;
+                
+                const total = subtotal + deliveryFee;
+                document.getElementById('totalAmount').textContent = `KSh ${total.toLocaleString()}`;
+                
+            } catch (error) {
+                console.error('Error loading cart items:', error);
+            }
+        }
+
+        function populateOrderDetails(order) {
+            // Populate order details
+            document.getElementById('orderDate').textContent = new Date(order.created_at).toLocaleDateString();
+            document.getElementById('paymentMethod').textContent = order.get_payment_method_display();
+            document.getElementById('deliveryCounty').textContent = order.delivery_county;
+            document.getElementById('deliveryTown').textContent = order.delivery_town;
+            document.getElementById('deliveryMethod').textContent = order.get_delivery_method_display();
+            document.getElementById('deliveryPoint').textContent = order.delivery_point;
+            document.getElementById('customerName').textContent = order.customer_name;
+            document.getElementById('customerEmail').textContent = order.customer_email;
+            document.getElementById('customerPhone').textContent = order.customer_phone;
+            
+            // Update payment status
+            const paymentStatusEl = document.getElementById('paymentStatus');
+            if (order.payment_status === 'completed') {
+                paymentStatusEl.className = 'payment-status payment-completed';
+                paymentStatusEl.textContent = 'Completed';
+            } else if (order.payment_status === 'failed') {
+                paymentStatusEl.className = 'payment-status payment-failed';
+                paymentStatusEl.textContent = 'Failed';
+            } else {
+                paymentStatusEl.className = 'payment-status payment-pending';
+                paymentStatusEl.textContent = 'Pending';
+            }
+            
+            // Update estimated delivery
+            if (order.estimated_delivery_date) {
+                const deliveryDate = new Date(order.estimated_delivery_date);
+                document.getElementById('estimatedDelivery').textContent = deliveryDate.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+            
+            // Update order timeline
+            updateOrderTimeline(order);
+        }
+
+        function updateOrderTimeline(order) {
+            const timeline = document.getElementById('orderTimeline');
+            timeline.innerHTML = '';
+            
+            // Add tracking updates
+            if (order.tracking_updates && order.tracking_updates.length > 0) {
+                order.tracking_updates.forEach(update => {
+                    const timelineItem = document.createElement('div');
+                    timelineItem.className = 'timeline-item';
+                    
+                    const iconClass = getTimelineIcon(update.status);
+                    const timeAgo = getTimeAgo(new Date(update.timestamp));
+                    
+                    timelineItem.innerHTML = `
+                        <div class="timeline-icon">
+                            <i class="bi ${iconClass}"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">${update.status}</div>
+                            <div class="timeline-time">${timeAgo}</div>
+                            <div class="timeline-description">${update.description}</div>
+                        </div>
+                    `;
+                    
+                    timeline.appendChild(timelineItem);
+                });
+            } else {
+                // Default timeline
+                const defaultTimeline = [
+                    { status: 'Order Confirmed', description: 'Your order has been confirmed', time: 'Just now', icon: 'bi-check' },
+                    { status: 'Processing', description: 'Your order is being prepared', time: 'Expected within 2 hours', icon: 'bi-box-seam' },
+                    { status: 'Out for Delivery', description: 'Your order is on its way', time: 'Expected tomorrow', icon: 'bi-truck' }
+                ];
+                
+                defaultTimeline.forEach(item => {
+                    const timelineItem = document.createElement('div');
+                    timelineItem.className = 'timeline-item';
+                    timelineItem.innerHTML = `
+                        <div class="timeline-icon">
+                            <i class="bi ${item.icon}"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">${item.status}</div>
+                            <div class="timeline-time">${item.time}</div>
+                            <div class="timeline-description">${item.description}</div>
+                        </div>
+                    `;
+                    timeline.appendChild(timelineItem);
+                });
+            }
+        }
+
+        function getTimelineIcon(status) {
+            const iconMap = {
+                'Order Confirmed': 'bi-check',
+                'Processing': 'bi-box-seam',
+                'Out for Delivery': 'bi-truck',
+                'Delivered': 'bi-house-check',
+                'Cancelled': 'bi-x-circle'
+            };
+            return iconMap[status] || 'bi-circle';
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+            
+            if (diffInSeconds < 60) return 'Just now';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+            if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        function checkPaymentStatus() {
+            // Check payment status for pending payments
+            const paymentStatus = document.getElementById('paymentStatus');
+            if (paymentStatus && paymentStatus.textContent === 'Pending') {
+                // Poll for payment status updates
+                setInterval(() => {
+                    const orderId = document.getElementById('orderId').textContent;
+                    if (orderId) {
+                        fetch(`/api/orders/${orderId}/payment-status/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success && data.payment_status !== 'pending') {
+                                    // Update payment status
+                                    if (data.payment_status === 'completed') {
+                                        paymentStatus.className = 'payment-status payment-completed';
+                                        paymentStatus.textContent = 'Completed';
+                                    } else if (data.payment_status === 'failed') {
+                                        paymentStatus.className = 'payment-status payment-failed';
+                                        paymentStatus.textContent = 'Failed';
+                                    }
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error checking payment status:', error);
+                            });
+                    }
+                }, 30000); // Check every 30 seconds
+            }
+        }
+
+        // Clear cart after successful order
+        localStorage.setItem('zetumart_cart_v1', '[]');
+    </script>
+</body>
+</html>

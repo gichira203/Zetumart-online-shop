@@ -1,0 +1,135 @@
+body {
+  background-color: #fbfbfb;
+}
+
+@media (min-width: 991.98px) {
+  main {
+    margin-left: 240px;
+  }
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding: 58px 0 0; /* Height of navbar */
+  box-shadow: 0 2px 5px 0 rgb(0 0 0 / 5%), 0 2px 10px 0 rgb(0 0 0 / 5%);
+  width: 240px;
+  z-index: 1000;
+  background-color: white;
+}
+
+.sidebar .list-group-item {
+  border-radius: 0;
+  border: none;
+  color: #4e73df;
+  padding: 1rem 1.5rem;
+}
+
+.sidebar .list-group-item:hover {
+  background-color: #eaecf4;
+  color: #2e59d9;
+}
+
+.sidebar .list-group-item.active {
+  background-color: #4e73df;
+  color: white;
+}
+
+.sidebar .list-group-item i {
+  width: 20px;
+  text-align: center;
+}
+
+/* Navbar */
+.navbar {
+  padding: 0.75rem 1rem;
+  background-color: #fff;
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.navbar-brand {
+  font-weight: 700;
+  color: #5a5c69 !important;
+}
+
+/* Main content */
+main {
+  margin-top: 58px;
+  padding: 1rem;
+  width: calc(100% - 240px);
+}
+
+/* Cards */
+.card {
+  border: none;
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  background-color: #f8f9fc;
+  border-bottom: 1px solid #e3e6f0;
+}
+
+/* Tables */
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #5a5c69;
+}
+
+/* Buttons */
+.btn {
+  font-size: 0.85rem;
+  border-radius: 0.35rem;
+}
+
+/* Forms */
+.form-control {
+  font-size: 0.85rem;
+  border-radius: 0.35rem;
+  border: 1px solid #d1d3e2;
+}
+
+.form-control:focus {
+  border-color: #bac8f3;
+  box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+@media (max-width: 991.98px) {
+  main {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .sidebar {
+    width: 100%;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.show {
+    transform: translateX(0);
+  }
+}
+.sidebar .active {
+  border-radius: 5px;
+  box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
+}
+
+.sidebar-sticky {
+  position: relative;
+  top: 0;
+  height: calc(100vh - 48px);
+  padding-top: 0.5rem;
+  overflow-x: hidden;
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+}

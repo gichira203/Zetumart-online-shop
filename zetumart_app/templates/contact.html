@@ -1,0 +1,442 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Contact - ZetuMart</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+  
+  <style>
+    .contact-page-title {
+      background-image: url('{% static "assets/img/hero-carousel/1.jpg" %}');
+    }
+    .contact-section {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding: 80px 0;
+    }
+    .contact-info-card {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      height: 100%;
+    }
+    .contact-info-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    .contact-info-card i {
+      font-size: 2.5rem;
+      color: #3498db;
+      margin-bottom: 20px;
+    }
+    .contact-form-container {
+      background: white;
+      border-radius: 15px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .contact-form-container .form-control {
+      border-radius: 10px;
+      border: 2px solid #e9ecef;
+      padding: 12px 15px;
+      transition: border-color 0.3s ease;
+    }
+    .contact-form-container .form-control:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    .contact-form-container .btn-primary {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      border: none;
+      border-radius: 10px;
+      padding: 12px 30px;
+      font-weight: 600;
+      transition: transform 0.3s ease;
+    }
+    .contact-form-container .btn-primary:hover {
+      transform: translateY(-2px);
+    }
+    .section-title {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .section-title h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+    .section-title p {
+      font-size: 1.1rem;
+      color: #6c757d;
+    }
+  </style>
+
+  <!-- =======================================================
+  * Template Name: UpConstruction
+  * Template URL: https://bootstrapmade.com/upconstruction-bootstrap-construction-website-template/
+  * Updated: Aug 07 2024 with Bootstrap v5.3.3
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body class="contact-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="{% static 'assets/img/logo.png' %}" alt=""> -->
+        <h1 class="sitename">ZetuMart</h1> <span>.</span>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'index' %}">Home</a></li>
+          <li><a href="{% url 'index' %}#projects">Shop</a></li>
+          <li class="dropdown"><a href="#"><span>Categories</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="{% url 'index' %}#projects" data-filter="*">All Products</a></li>
+              <li><a href="{% url 'index' %}#projects" data-filter=".filter-phones">Phones & Tablets</a></li>
+              <li><a href="{% url 'index' %}#projects" data-filter=".filter-electronics">Electronics</a></li>
+              <li><a href="{% url 'index' %}#projects" data-filter=".filter-fashion">Fashion</a></li>
+              <li><a href="{% url 'index' %}#projects" data-filter=".filter-supermarket">Supermarket</a></li>
+              <li><a href="{% url 'index' %}#projects" data-filter=".filter-home">Home & Living</a></li>
+            </ul>
+          </li>
+          
+          <li><a href="{% url 'contact' %}" class="active">Contact</a></li>
+          <li><a href="#" class="d-flex align-items-center"><i class="bi bi-cart" style="font-size: 1.1rem; margin-right: 6px;"></i>Cart</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background contact-page-title">
+      <div class="container position-relative">
+        <h1>Contact</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'index' %}">Home</a></li>
+            <li class="current">Contact</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section section">
+
+      <div class="container">
+        <div class="section-title" data-aos="fade-up">
+          <h2>Get in Touch</h2>
+          <p>We're here to help you with your shopping needs. Reach out to us for any questions or support.</p>
+        </div>
+
+        <div class="row gy-4">
+
+          <div class="col-lg-4">
+            <div class="contact-info-card" data-aos="fade-up" data-aos-delay="200">
+              <div class="text-center">
+                <i class="bi bi-geo-alt-fill"></i>
+                <h4>Visit Our Store</h4>
+                <p>Nairobi Central Business District<br>Moi Avenue, ZetuMart Plaza<br>Kenya</p>
+              </div>
+            </div>
+          </div><!-- End Info Item -->
+
+          <div class="col-lg-4">
+            <div class="contact-info-card" data-aos="fade-up" data-aos-delay="300">
+              <div class="text-center">
+                <i class="bi bi-telephone-fill"></i>
+                <h4>Call Customer Care</h4>
+                <p><strong>Toll Free:</strong> 0800-123-456<br><strong>Mobile:</strong> +254 700 000000<br><strong>WhatsApp:</strong> +254 711 111111</p>
+              </div>
+            </div>
+          </div><!-- End Info Item -->
+
+          <div class="col-lg-4">
+            <div class="contact-info-card" data-aos="fade-up" data-aos-delay="400">
+              <div class="text-center">
+                <i class="bi bi-envelope-fill"></i>
+                <h4>Email Support</h4>
+                <p><strong>General:</strong> info@zetumart.co.ke<br><strong>Orders:</strong> orders@zetumart.co.ke<br><strong>Support:</strong> support@zetumart.co.ke</p>
+              </div>
+            </div>
+          </div><!-- End Info Item -->
+
+        </div>
+
+        <div class="row gy-4 mt-5">
+          <div class="col-lg-12" data-aos="fade-up" data-aos-delay="300">
+            <div class="contact-form-container">
+              <h3 class="text-center mb-4">Send Us a Message</h3>
+              <form method="post" action="{% url 'contact' %}" id="contactForm">
+                {% csrf_token %}
+                {% if messages %}
+                  <div class="row gy-4">
+                    <div class="col-md-12">
+                      {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                          {{ message }}
+                          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+                <div class="row gy-4">
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <input type="text" name="name" class="form-control" placeholder="Your Full Name" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <input type="email" class="form-control" name="email" placeholder="Your Email Address" required>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <input type="tel" name="phone" class="form-control" placeholder="Your Phone Number (Optional)">
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <select name="subject" class="form-control" required>
+                        <option value="">Select Topic</option>
+                        <option value="order-inquiry">Order Inquiry</option>
+                        <option value="product-question">Product Question</option>
+                        <option value="shipping">Shipping & Delivery</option>
+                        <option value="returns">Returns & Refunds</option>
+                        <option value="payment">Payment Issues</option>
+                        <option value="technical">Technical Support</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <textarea class="form-control" name="message" rows="6" placeholder="Tell us more about your inquiry..." required></textarea>
+                    </div>
+                  </div>
+
+                  <div class="col-md-12 text-center">
+                    <div id="formStatus" class="mb-3"></div>
+                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                      <i class="bi bi-send-fill me-2"></i>Send Message
+                    </button>
+                  </div>
+
+                </div>
+              </form>
+            </div>
+          </div><!-- End Contact Form -->
+
+        </div>
+
+      </div>
+
+    </section><!-- /Contact Section -->
+
+  </main>
+
+  <footer id="footer" class="footer dark-background">
+
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6 footer-about">
+          <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+            <span class="sitename">ZetuMart</span>
+          </a>
+          <div class="footer-contact pt-3">
+            <p>A108 Adam Street</p>
+            <p>New York, NY 535022</p>
+            <p class="mt-3"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
+            <p><strong>Email:</strong> <span>info@example.com</span></p>
+          </div>
+          <div class="social-links d-flex mt-4">
+            <a href=""><i class="bi bi-twitter-x"></i></a>
+            <a href=""><i class="bi bi-facebook"></i></a>
+            <a href=""><i class="bi bi-instagram"></i></a>
+            <a href=""><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Useful Links</h4>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#projects">Shop</a></li>
+            <li><a href="#services">Categories</a></li>
+            <li><a href="#">Terms of service</a></li>
+            <li><a href="#">Privacy policy</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Shopping Categories</h4>
+          <ul>
+            <li><a href="#">Electronics & Gadgets</a></li>
+            <li><a href="#">Fashion & Apparel</a></li>
+            <li><a href="#">Home & Living</a></li>
+            <li><a href="#">Sports & Outdoors</a></li>
+            <li><a href="#">Books & Media</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Customer Service</h4>
+          <ul>
+            <li><a href="#">Track Your Order</a></li>
+            <li><a href="#">Shipping Information</a></li>
+            <li><a href="#">Returns & Exchanges</a></li>
+            <li><a href="#">Payment Methods</a></li>
+            <li><a href="#">FAQs</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>About ZetuMart</h4>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Press & Media</a></li>
+            <li><a href="#">Seller Center</a></li>
+            <li><a href="#">Affiliate Program</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">ZetuMart</strong> <span>All Rights Reserved</span></p>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you've purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'assets/js/main.js' %}"></script>
+
+  <!-- Contact Form JavaScript -->
+  <script>
+    // Get CSRF token function
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const formStatus = document.getElementById('formStatus');
+      const formData = new FormData(this);
+      
+      // Show loading state
+      submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Sending...';
+      submitBtn.disabled = true;
+      formStatus.innerHTML = '';
+      
+      // Submit the form
+      fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': getCookie('csrftoken')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          formStatus.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i>Your message has been sent successfully! We will get back to you soon.</div>';
+          this.reset();
+        } else {
+          formStatus.innerHTML = '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>There was an error sending your message. Please try again.</div>';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        formStatus.innerHTML = '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>There was an error sending your message. Please try again.</div>';
+      })
+      .finally(() => {
+        submitBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Send Message';
+        submitBtn.disabled = false;
+      });
+    });
+  </script>
+
+</body>
+
+</html>
