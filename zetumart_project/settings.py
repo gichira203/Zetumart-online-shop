@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure--lxpsewqpo&xyzwcs#ud^ly7#)n)wg)g4i)0_rj6^&8y)zsl^@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'zetumart_app',
 ]
 
@@ -59,9 +60,11 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.csrf',
             ],
         },
     },
@@ -116,6 +119,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'zetumart_app' / 'static',
 ]
@@ -128,3 +132,24 @@ MEDIA_ROOT = BASE_DIR / 'zetumart_app' / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Login and authentication settings
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/shop/'
+LOGOUT_REDIRECT_URL = '/'
+
+# M-Pesa Payment Gateway Settings
+import os
+MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY', 'lAPb8KTpWSqcgr1PWDyzbeyRRhuq8AqZzoh2CqrWuXEp71qy')
+MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET', '6tyMucRrUdEYbSm5cwX4S9kMZDAA3e78ADdMjeCprELZoZkJ6WZAVDaFLVVGyZLc')
+MPESA_PASSKEY = os.environ.get('MPESA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919')
+MPESA_BUSINESS_SHORTCODE = os.environ.get('MPESA_BUSINESS_SHORTCODE', '174379')
+# For production, set this via environment variable with your public URL
+# For development, use webhook.site or ngrok for testing
+MPESA_CALLBACK_URL = os.environ.get('MPESA_CALLBACK_URL', 'https://webhook.site/fdedfba1-646f-4ad3-adbe-09df6beede3a')
+
+# PayPal Settings
+PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID', 'your-paypal-client-id')
+PAYPAL_CLIENT_SECRET = os.environ.get('PAYPAL_CLIENT_SECRET', 'your-paypal-client-secret')
+PAYPAL_RETURN_URL = os.environ.get('PAYPAL_RETURN_URL', 'https://yourdomain.com/payment/success/')
+PAYPAL_CANCEL_URL = os.environ.get('PAYPAL_CANCEL_URL', 'https://yourdomain.com/payment/cancel/')

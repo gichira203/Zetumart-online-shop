@@ -580,7 +580,7 @@ class ZetuMartAdmin {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding Product...';
     
     try {
-      const response = await fetch('/api/admin/products/', {
+      const response = await fetch('/api/products/add/', {
         method: 'POST',
         body: formData,
         headers: {

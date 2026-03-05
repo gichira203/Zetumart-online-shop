@@ -135,11 +135,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ZetuMart E-commerce Settings
 
 # Payment Gateway Settings
-MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY', 'your-consumer-key')
-MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET', 'your-consumer-secret')
-MPESA_PASSKEY = os.environ.get('MPESA_PASSKEY', 'your-passkey')
+MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY', 'g79MI8sT4rtuRn6kpN0MUT3Reki5jwKtWb1sCJAuSlpsZeE3')
+MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET', '8jueQt8z00ZN5bf7PZT1fVk7gyu5B0YGmVbmYAjimcfcJMJwczr4kmiUZHR7SP6m')
+MPESA_PASSKEY = os.environ.get('MPESA_PASSKEY', 'bfb279f9aa9bdbcf158e97dd1a503b6055c2f8e4cd4f54f0de89a387cd2d6c9e')
 MPESA_BUSINESS_SHORTCODE = os.environ.get('MPESA_BUSINESS_SHORTCODE', '174379')
-MPESA_CALLBACK_URL = os.environ.get('MPESA_CALLBACK_URL', 'https://yourdomain.com/api/mpesa/callback/')
+MPESA_CALLBACK_URL = os.environ.get('MPESA_CALLBACK_URL', 'http://127.0.0.1:8000/api/mpesa/callback/')
 
 # PayPal Settings
 PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID', 'your-paypal-client-id')

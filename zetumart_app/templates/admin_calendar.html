@@ -1,0 +1,627 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <!-- Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ZetuMart Admin Dashboard - Calendar">
+    <meta name="keywords" content="bootstrap, admin, dashboard, template, modern, responsive">
+    <meta name="author" content="ZetuMart Admin">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="ZetuMart Admin - Calendar">
+    <meta property="og:description" content="Calendar and Events - Clean and modern admin dashboard template built with Bootstrap 5">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'Bootstrap-Admin-Template/dist-modern/assets/icons/favicon.svg' %}">
+    <link rel="icon" type="image/png" href="{% static 'Bootstrap-Admin-Template/dist-modern/assets/icons/favicon.png' %}">
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Title -->
+    <title>ZetuMart Admin - Calendar</title>
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#6366f1">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{% static 'Bootstrap-Admin-Template/dist-modern/assets/manifest-DTaoG9pG.json' %}">
+    
+    <!-- Your Metis CSS and JS -->
+    <script type="module" crossorigin src="{% static 'Bootstrap-Admin-Template/dist-modern/assets/vendor-bootstrap-C9iorZI5.js' %}"></script>
+    <script type="module" crossorigin src="{% static 'Bootstrap-Admin-Template/dist-modern/assets/vendor-charts-DGwYAWel.js' %}"></script>
+    <script type="module" crossorigin src="{% static 'Bootstrap-Admin-Template/dist-modern/assets/vendor-ui-CflGdlft.js' %}"></script>
+    <script type="module" crossorigin src="{% static 'Bootstrap-Admin-Template/dist-modern/assets/main-B24LRf0x.js' %}"></script>
+    <link rel="stylesheet" crossorigin href="{% static 'Bootstrap-Admin-Template/dist-modern/assets/main-BQhM7myw.css' %}">
+</head>
+
+<body data-page="calendar" class="admin-layout">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Wrapper -->
+    <div class="admin-wrapper" id="admin-wrapper">
+        
+        <!-- Header -->
+        <header class="admin-header">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+                <div class="container-fluid">
+                    <!-- Logo/Brand -->
+                    <a class="navbar-brand d-flex align-items-center" href="#">
+                        <img src="{% static 'Bootstrap-Admin-Template/dist-modern/assets/images/logo.svg' %}" alt="Logo" height="32" class="d-inline-block align-text-top me-2">
+                        <h1 class="h4 mb-0 fw-bold text-primary">ZetuMart</h1>
+                    </a>
+
+                    <!-- Sidebar Toggle -->
+                    <button class="hamburger-menu" type="button" data-sidebar-toggle aria-label="Toggle sidebar">
+                        <i class="bi bi-list"></i>
+                    </button>
+
+                    <!-- Search Bar -->
+                    <div class="search-container flex-grow-1 mx-4">
+                        <div class="position-relative">
+                            <input type="search" 
+                                   class="form-control" 
+                                   placeholder="Search calendar... (Ctrl+K)"
+                                   aria-label="Search">
+                            <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-3"></i>
+                        </div>
+                    </div>
+
+                    <!-- Right Side Icons -->
+                    <div class="navbar-nav flex-row">
+                        <!-- Notifications -->
+                        <div class="dropdown me-2">
+                            <button class="btn btn-outline-secondary position-relative" 
+                                    type="button" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false">
+                                <i class="bi bi-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    3
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><h6 class="dropdown-header">Notifications</h6></li>
+                                <li><a class="dropdown-item" href="#">New user registered</a></li>
+                                <li><a class="dropdown-item" href="#">Server status update</a></li>
+                                <li><a class="dropdown-item" href="#">New message received</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-center" href="#">View all notifications</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- User Menu -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary d-flex align-items-center" 
+                                    type="button" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false">
+                                <img src="{% static 'Bootstrap-Admin-Template/dist-modern/assets/images/avatar-placeholder.svg' %}" 
+                                     alt="User Avatar" 
+                                     width="24" 
+                                     height="24" 
+                                     class="rounded-circle me-2">
+                                <span class="d-none d-md-inline">{{ user.get_full_name|default:user.username }}</span>
+                                <i class="bi bi-chevron-down ms-1"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="admin-sidebar">
+            <div class="sidebar-content">
+                <nav class="sidebar-nav">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_dashboard' %}">
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_order_management' %}">
+                                <i class="bi bi-bag-check"></i>
+                                <span>Orders</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'products' %}">
+                                <i class="bi bi-box"></i>
+                                <span>Products</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_user_management' %}">
+                                <i class="bi bi-people"></i>
+                                <span>Users</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_message_management' %}">
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Messages</span>
+                                <span class="badge bg-danger rounded-pill ms-auto">3</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_elements' %}">
+                                <i class="bi bi-puzzle"></i>
+                                <span>Elements</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_reports' %}">
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Reports</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'admin_calendar' %}">
+                                <i class="bi bi-calendar-event"></i>
+                                <span>Calendar</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_files' %}">
+                                <i class="bi bi-folder2-open"></i>
+                                <span>Files</span>
+                            </a>
+                        </li>
+                        <li class="nav-item mt-3">
+                            <small class="text-muted px-3 text-uppercase fw-bold">Admin</small>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_settings' %}">
+                                <i class="bi bi-gear"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="container-fluid p-4">
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="h3 mb-1">Calendar</h1>
+                        <p class="text-muted mb-0">Manage your schedule, events, and appointments</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary" onclick="previousMonth()">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="currentMonth()">
+                            Today
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="nextMonth()">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
+                            <i class="bi bi-plus-lg me-1"></i>Add Event
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Calendar -->
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0" id="currentMonth">February 2026</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="calendar-container">
+                                    <div class="calendar-grid">
+                                        <!-- Weekday headers -->
+                                        <div class="calendar-weekdays">
+                                            <div class="weekday">Sun</div>
+                                            <div class="weekday">Mon</div>
+                                            <div class="weekday">Tue</div>
+                                            <div class="weekday">Wed</div>
+                                            <div class="weekday">Thu</div>
+                                            <div class="weekday">Fri</div>
+                                            <div class="weekday">Sat</div>
+                                        </div>
+                                        <!-- Calendar days will be generated by JavaScript -->
+                                        <div class="calendar-days" id="calendarDays">
+                                            <!-- Days will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Events Sidebar -->
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Upcoming Events</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="events-list">
+                                    <div class="event-item mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <div class="event-date bg-primary text-white rounded p-2 me-3">
+                                                <div class="text-center">
+                                                    <div class="small">FEB</div>
+                                                    <div class="fw-bold">15</div>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Product Launch Meeting</h6>
+                                                <p class="text-muted small mb-1">10:00 AM - 11:30 AM</p>
+                                                <p class="text-muted small mb-0">Conference Room A</p>
+                                                <span class="badge bg-primary">Meeting</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="event-item mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <div class="event-date bg-success text-white rounded p-2 me-3">
+                                                <div class="text-center">
+                                                    <div class="small">FEB</div>
+                                                    <div class="fw-bold">18</div>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Quarterly Review</h6>
+                                                <p class="text-muted small mb-1">2:00 PM - 4:00 PM</p>
+                                                <p class="text-muted small mb-0">Main Office</p>
+                                                <span class="badge bg-success">Review</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="event-item mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <div class="event-date bg-warning text-white rounded p-2 me-3">
+                                                <div class="text-center">
+                                                    <div class="small">FEB</div>
+                                                    <div class="fw-bold">22</div>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Team Building Event</h6>
+                                                <p class="text-muted small mb-1">All Day</p>
+                                                <p class="text-muted small mb-0">Outdoor Venue</p>
+                                                <span class="badge bg-warning">Event</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="event-item mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <div class="event-date bg-info text-white rounded p-2 me-3">
+                                                <div class="text-center">
+                                                    <div class="small">FEB</div>
+                                                    <div class="fw-bold">25</div>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Client Presentation</h6>
+                                                <p class="text-muted small mb-1">3:00 PM - 5:00 PM</p>
+                                                <p class="text-muted small mb-0">Virtual Meeting</p>
+                                                <span class="badge bg-info">Presentation</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="event-item mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <div class="event-date bg-danger text-white rounded p-2 me-3">
+                                                <div class="text-center">
+                                                    <div class="small">FEB</div>
+                                                    <div class="fw-bold">28</div>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Deadline: Monthly Report</h6>
+                                                <p class="text-muted small mb-1">End of Day</p>
+                                                <p class="text-muted small mb-0">Online Submission</p>
+                                                <span class="badge bg-danger">Deadline</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">This Month</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <div class="text-primary">
+                                            <i class="bi bi-calendar-check" style="font-size: 1.5rem;"></i>
+                                        </div>
+                                        <h4 class="mb-0">12</h4>
+                                        <small class="text-muted">Events</small>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="text-success">
+                                            <i class="bi bi-people" style="font-size: 1.5rem;"></i>
+                                        </div>
+                                        <h4 class="mb-0">8</h4>
+                                        <small class="text-muted">Meetings</small>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="text-warning">
+                                            <i class="bi bi-flag" style="font-size: 1.5rem;"></i>
+                                        </div>
+                                        <h4 class="mb-0">3</h4>
+                                        <small class="text-muted">Deadlines</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div class="modal fade" id="addEventModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-plus-lg me-2"></i>Add New Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="eventTitle" class="form-label">Event Title *</label>
+                            <input type="text" class="form-control" id="eventTitle" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="eventDate" class="form-label">Date *</label>
+                                    <input type="date" class="form-control" id="eventDate" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="eventTime" class="form-label">Time</label>
+                                    <input type="time" class="form-control" id="eventTime">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventLocation" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="eventLocation" placeholder="e.g., Conference Room A">
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventCategory" class="form-label">Category</label>
+                            <select class="form-select" id="eventCategory">
+                                <option value="meeting">Meeting</option>
+                                <option value="event">Event</option>
+                                <option value="deadline">Deadline</option>
+                                <option value="presentation">Presentation</option>
+                                <option value="review">Review</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="eventDescription" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Add Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .calendar-container {
+            padding: 1rem;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .calendar-weekdays {
+            display: contents;
+        }
+        .weekday {
+            padding: 0.75rem;
+            text-align: center;
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .calendar-days {
+            display: contents;
+        }
+        .calendar-day {
+            min-height: 80px;
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            position: relative;
+        }
+        .calendar-day:not(.other-month):hover {
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+        .calendar-day.other-month {
+            color: #adb5bd;
+        }
+        .calendar-day.today {
+            background-color: #e7f5ff;
+        }
+        .calendar-day.selected {
+            background-color: #cff4fc;
+        }
+        .day-number {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        .calendar-day.today .day-number {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+        .event-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin: 1px;
+            display: inline-block;
+        }
+        .events-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .event-date {
+            min-width: 50px;
+        }
+    </style>
+
+    <script>
+        let currentDate = new Date();
+        let selectedDate = null;
+
+        function initCalendar() {
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // Update month header
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+            
+            // Clear calendar days
+            const calendarDays = document.getElementById('calendarDays');
+            calendarDays.innerHTML = '';
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            
+            // Add previous month's trailing days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = daysInPrevMonth - i;
+                const dayElement = createDayElement(day, true, false);
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // Add current month's days
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isToday = year === today.getFullYear() && 
+                               month === today.getMonth() && 
+                               day === today.getDate();
+                const dayElement = createDayElement(day, false, isToday);
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // Add next month's leading days
+            const totalCells = calendarDays.children.length;
+            const remainingCells = 42 - totalCells; // 6 rows * 7 days
+            for (let day = 1; day <= remainingCells; day++) {
+                const dayElement = createDayElement(day, true, false);
+                calendarDays.appendChild(dayElement);
+            }
+        }
+
+        function createDayElement(day, isOtherMonth, isToday) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            if (isOtherMonth) dayElement.classList.add('other-month');
+            if (isToday) dayElement.classList.add('today');
+            
+            const dayNumber = document.createElement('div');
+            dayNumber.className = 'day-number';
+            dayNumber.textContent = day;
+            dayElement.appendChild(dayNumber);
+            
+            // Add sample events (in real app, these would come from database)
+            if (!isOtherMonth && Math.random() > 0.7) {
+                const eventDot = document.createElement('div');
+                eventDot.className = 'event-dot';
+                eventDot.style.backgroundColor = ['#6366f1', '#10b981', '#f59e0b', '#ef4444'][Math.floor(Math.random() * 4)];
+                dayElement.appendChild(eventDot);
+            }
+            
+            if (!isOtherMonth) {
+                dayElement.addEventListener('click', () => selectDate(day));
+            }
+            
+            return dayElement;
+        }
+
+        function selectDate(day) {
+            // Remove previous selection
+            document.querySelectorAll('.calendar-day.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Add selection to clicked day
+            const dayElements = document.querySelectorAll('.calendar-day:not(.other-month)');
+            const index = day - 1;
+            if (dayElements[index]) {
+                dayElements[index].classList.add('selected');
+            }
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function currentMonth() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        // Initialize calendar on page load
+        document.addEventListener('DOMContentLoaded', initCalendar);
+    </script>
+</body>
+</html>

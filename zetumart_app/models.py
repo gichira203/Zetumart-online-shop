@@ -50,11 +50,14 @@ class ContactMessage(models.Model):
 class Order(models.Model):
     ORDER_STATUS = [
         ('pending', 'Pending'),
+        ('awaiting_payment', 'Awaiting Payment'),
+        ('paid', 'Paid'),
         ('confirmed', 'Confirmed'),
         ('processing', 'Processing'),
         ('shipped', 'Shipped'),
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled'),
+        ('failed', 'Failed'),
         ('refunded', 'Refunded')
     ]
     
@@ -76,8 +79,10 @@ class Order(models.Model):
     ]
     
     PAYMENT_METHODS = [
-        ('mpesa', 'M-Pesa STK Push'),
-        ('till', 'M-Pesa Till/PayBill'),
+        ('mpesa_stk', 'M-Pesa STK Push'),
+        ('mpesa_paybill', 'M-Pesa Paybill'),
+        ('mpesa_till', 'M-Pesa Till'),
+        ('mpesa_pochi', 'M-Pesa Pochi'),
         ('cod', 'Pay on Delivery'),
         ('polepole', 'Lipa Mdogo Mdogo'),
         ('card', 'Card Payment'),
@@ -247,6 +252,53 @@ class CustomerCareMessage(models.Model):
         if self.user:
             return f"Message from {self.user.username}"
         return f"Message from {self.name or 'Anonymous'}"
+
+class PaymentTransaction(models.Model):
+    TRANSACTION_TYPES = [
+        ('stk_push', 'M-Pesa STK Push'),
+        ('paybill', 'M-Pesa Paybill/Till'),
+        ('pochi', 'M-Pesa Pochi'),
+        ('transaction_status', 'Transaction Status Query'),
+        ('reversal', 'Transaction Reversal')
+    ]
+    
+    TRANSACTION_STATUS = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+        ('cancelled', 'Cancelled'),
+        ('timeout', 'Timeout')
+    ]
+    
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payment_transactions')
+    transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPES)
+    transaction_id = models.CharField(max_length=100, unique=True)  # M-Pesa transaction ID
+    merchant_request_id = models.CharField(max_length=100, blank=True, null=True)  # For STK Push
+    checkout_request_id = models.CharField(max_length=100, blank=True, null=True)  # For STK Push
+    
+    # Transaction details
+    phone_number = models.CharField(max_length=20)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    receipt_number = models.CharField(max_length=100, blank=True, null=True)  # M-Pesa receipt number
+    transaction_date = models.DateTimeField(null=True, blank=True)
+    
+    # Status and response
+    status = models.CharField(max_length=20, choices=TRANSACTION_STATUS, default='pending')
+    result_code = models.CharField(max_length=10, blank=True, null=True)
+    result_desc = models.TextField(blank=True, null=True)
+    
+    # Raw API response for debugging
+    response_data = models.JSONField(null=True, blank=True)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.transaction_type} - {self.transaction_id} - {self.status}"
+    
+    class Meta:
+        ordering = ['-created_at']
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

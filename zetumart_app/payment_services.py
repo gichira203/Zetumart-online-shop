@@ -16,34 +16,60 @@ class MpesaPaymentService:
         self.consumer_secret = getattr(settings, 'MPESA_CONSUMER_SECRET', '')
         self.passkey = getattr(settings, 'MPESA_PASSKEY', '')
         self.business_shortcode = getattr(settings, 'MPESA_BUSINESS_SHORTCODE', '174379')
-        self.base_url = 'https://api.safaricom.co.ke'
-        self.callback_url = getattr(settings, 'MPESA_CALLBACK_URL', 'https://yourdomain.com/api/mpesa/callback/')
+        # Use sandbox for testing
+        self.base_url = 'https://sandbox.safaricom.co.ke'
+        self.callback_url = getattr(settings, 'MPESA_CALLBACK_URL', 'http://127.0.0.1:8000/api/mpesa/callback/')
         
     def get_access_token(self):
         """Get M-Pesa API access token"""
         try:
             api_url = f"{self.base_url}/oauth/v1/generate?grant_type=client_credentials"
+            print(f'[M-Pesa] Getting token from: {api_url}')
+            print(f'[M-Pesa] Using Consumer Key: {self.consumer_key[:20]}...')
+            
             response = requests.get(
                 api_url,
                 auth=(self.consumer_key, self.consumer_secret)
             )
             
+            print(f'[M-Pesa] Token response status: {response.status_code}')
+            
             if response.status_code == 200:
-                return response.json().get('access_token')
+                token = response.json().get('access_token')
+                print(f'[M-Pesa] Token generated successfully: {token[:30]}...')
+                return token
             else:
+                print(f'[M-Pesa] Token error: {response.status_code} - {response.text}')
                 return None
         except Exception as e:
             print(f"M-Pesa token error: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def initiate_stk_push(self, phone_number, amount, order_id, account_reference=None):
         """Initiate M-Pesa STK Push payment"""
         try:
+            print(f'\n[M-Pesa STK] Starting STK push for: {phone_number}, Amount: {amount}')
+            
+            # Check if we're in test mode (no valid shortcode)
+            if not self.business_shortcode or self.business_shortcode == 'N/A' or self.business_shortcode == '':
+                print(f'[M-Pesa STK] TEST MODE: No business shortcode configured')
+                print(f'[M-Pesa STK] Simulating successful payment...')
+                return {
+                    'success': True,
+                    'checkout_request_id': 'ws_CO_TEST_' + str(int(__import__('time').time())),
+                    'merchant_request_id': 'TEST_' + str(int(__import__('time').time())),
+                    'customer_message': 'TEST MODE: Payment request would be sent. In production, you would receive an STK prompt on your phone.',
+                    'test_mode': True
+                }
+            
             access_token = self.get_access_token()
             if not access_token:
                 return {'success': False, 'error': 'Failed to get access token'}
             
             # Format phone number (remove +254 if present, ensure starts with 254)
+            original_phone = phone_number
             if phone_number.startswith('+254'):
                 phone_number = phone_number.replace('+254', '254')
             elif phone_number.startswith('07'):
@@ -51,10 +77,15 @@ class MpesaPaymentService:
             elif phone_number.startswith('01'):
                 phone_number = phone_number.replace('01', '2541')
             
+            print(f'[M-Pesa STK] Phone formatted: {original_phone} -> {phone_number}')
+            
             # Generate password
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
             password_string = f"{self.business_shortcode}{self.passkey}{timestamp}"
             password = base64.b64encode(password_string.encode()).decode()
+            
+            print(f'[M-Pesa STK] Timestamp: {timestamp}')
+            print(f'[M-Pesa STK] Business Shortcode: {self.business_shortcode}')
             
             # Prepare STK push request
             api_url = f"{self.base_url}/mpesa/stkpush/v1/processrequest"
@@ -67,21 +98,28 @@ class MpesaPaymentService:
                 'BusinessShortCode': self.business_shortcode,
                 'Password': password,
                 'Timestamp': timestamp,
-                'TransactionType': 'CustomerPayBillOnline',
                 'Amount': int(amount),
                 'PartyA': phone_number,
                 'PartyB': self.business_shortcode,
                 'PhoneNumber': phone_number,
-                'CallBackURL': f"{self.callback_url}?order_id={order_id}",
-                'AccountReference': account_reference or f"ZM{order_id}",
-                'TransactionDesc': f"Payment for order {order_id}"
+                'TransactionType': 'CustomerPayBillOnline',
+                'TransactionDesc': 'Payment to Zetumart',
+                'AccountReference': account_reference or f"Zetumart Order {order_id}",
+                'CallBackURL': self.callback_url
             }
             
+            print(f'[M-Pesa STK] Sending STK push to: {api_url}')
+            print(f'[M-Pesa STK] Payload: {json.dumps(payload, indent=2)}')
+            
             response = requests.post(api_url, json=payload, headers=headers)
+            
+            print(f'[M-Pesa STK] Response status: {response.status_code}')
+            print(f'[M-Pesa STK] Response body: {response.text}')
             
             if response.status_code == 200:
                 result = response.json()
                 if result.get('ResponseCode') == '0':
+                    print(f'[M-Pesa STK] SUCCESS! CheckoutRequestID: {result.get("CheckoutRequestID")}')
                     return {
                         'success': True,
                         'checkout_request_id': result.get('CheckoutRequestID'),
@@ -89,14 +127,18 @@ class MpesaPaymentService:
                         'customer_message': result.get('CustomerMessage')
                     }
                 else:
+                    error_msg = result.get('errorMessage', 'STK push failed')
+                    print(f'[M-Pesa STK] ERROR: {error_msg}')
                     return {
                         'success': False,
-                        'error': result.get('errorMessage', 'STK push failed')
+                        'error': error_msg
                     }
             else:
+                error_msg = f'HTTP {response.status_code}: {response.text}'
+                print(f'[M-Pesa STK] HTTP ERROR: {error_msg}')
                 return {
                     'success': False,
-                    'error': f'HTTP {response.status_code}: {response.text}'
+                    'error': error_msg
                 }
                 
         except Exception as e:
@@ -148,6 +190,97 @@ class MpesaPaymentService:
         except Exception as e:
             return {
                 'success': False,
+                'error': str(e)
+            }
+
+    def check_transaction_status(self, checkout_request_id):
+        """Check the status of an M-Pesa STK push transaction"""
+        try:
+            import time
+            import base64
+            from datetime import datetime
+            
+            # Get OAuth token
+            token = self.get_oauth_token()
+            if not token:
+                return {'success': False, 'error': 'Failed to get OAuth token'}
+            
+            # Business Shortcode and Passkey
+            business_shortcode = settings.MPESA_BUSINESS_SHORTCODE
+            passkey = settings.MPESA_PASSKEY
+            
+            # Generate timestamp
+            timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+            
+            # Generate password
+            password_str = f"{business_shortcode}{passkey}{timestamp}"
+            password = base64.b64encode(password_str.encode()).decode()
+            
+            # API endpoint for transaction status
+            endpoint = f"{self.base_url}/mpesa/stkpushquery/v1/query"
+            
+            # Prepare payload
+            payload = {
+                "BusinessShortCode": business_shortcode,
+                "Password": password,
+                "Timestamp": timestamp,
+                "CheckoutRequestID": checkout_request_id
+            }
+            
+            # Make API request
+            headers = {
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json"
+            }
+            
+            response = requests.post(endpoint, json=payload, headers=headers, timeout=30)
+            
+            if response.status_code == 200:
+                result = response.json()
+                
+                # Check response code
+                if result.get('ResponseCode') == '0':
+                    # Get the result metadata
+                    result_metadata = result.get('Result', {})
+                    result_code = result_metadata.get('ResultCode', '1')
+                    
+                    if result_code == '0':
+                        # Transaction successful
+                        return {
+                            'success': True,
+                            'status': 'completed',
+                            'message': 'Payment completed successfully',
+                            'transaction_id': result_metadata.get('TransactionID', ''),
+                            'amount': result_metadata.get('Amount', 0)
+                        }
+                    else:
+                        # Transaction failed
+                        result_desc = result_metadata.get('ResultDesc', 'Transaction failed')
+                        return {
+                            'success': False,
+                            'status': 'failed',
+                            'reason': result_desc,
+                            'result_code': result_code
+                        }
+                else:
+                    # Error in response
+                    return {
+                        'success': False,
+                        'status': 'failed',
+                        'reason': result.get('ResponseDescription', 'Transaction query failed')
+                    }
+            else:
+                return {
+                    'success': False,
+                    'status': 'pending',
+                    'reason': f'HTTP {response.status_code}: Unable to check status'
+                }
+                
+        except Exception as e:
+            logger.error(f"Error checking transaction status: {str(e)}")
+            return {
+                'success': False,
+                'status': 'pending',
                 'error': str(e)
             }
 

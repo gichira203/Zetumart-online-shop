@@ -1,1176 +1,1141 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Checkout - ZetuMart Ecommerce</title>
-    <meta name="description" content="">
-    <meta name="keywords" content="">
-
-    <!-- Favicons -->
-    <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
-    <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-
-    <!-- Vendor CSS Files -->
-    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
-
-    <!-- Main CSS File -->
-    <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Zetumart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .checkout-container {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navigation Header */
+        .checkout-nav {
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        
-        .checkout-section {
-            background: white;
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-        
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 20px;
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
             color: #2c3e50;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-brand:hover {
+            color: #3498db;
+        }
+
+        .close-checkout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-checkout:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        /* Main Checkout Container */
+        .checkout-wrapper {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .checkout-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            font-family: inherit;
+            border: 1px solid #e9ecef;
+        }
+
+        .checkout-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .checkout-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .checkout-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
             border-bottom: 2px solid #3498db;
             padding-bottom: 10px;
         }
-        
-        .county-grid {
-            display: none; /* Hide the old grid system */
+
+        .form-group {
+            margin-bottom: 20px;
         }
-        
-        .search-dropdown {
-            position: relative;
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
         }
-        
-        .search-input {
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.3s ease;
+            font-family: inherit;
+            transition: border-color 0.3s;
+            background-color: #fff;
         }
-        
-        .search-input:focus {
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
             border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         }
-        
-        .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
+
+        .payment-methods {
+            display: grid;
+            gap: 15px;
+        }
+
+        .payment-method {
             background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: none;
-        }
-        
-        .search-result-item {
-            padding: 12px;
-            cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
-            transition: background-color 0.2s ease;
-        }
-        
-        .search-result-item:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .search-result-item:last-child {
-            border-bottom: none;
-        }
-        
-        .selected-item {
-            background-color: #e3f2fd;
-            color: #1976d2;
-            font-weight: 500;
-        }
-        
-        .loading-spinner {
-            display: none;
-            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 10px;
             padding: 20px;
-            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        
-        .county-card {
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+
+        .payment-method:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .payment-method.selected {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+
+        .payment-method input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .payment-details {
+            margin-top: 15px;
             padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-        
-        .county-card:hover {
-            border-color: #3498db;
             background: #f8f9fa;
-        }
-        
-        .county-card.selected {
-            border-color: #3498db;
-            background: #e3f2fd;
-        }
-        
-        .payment-method-card {
-            border: 2px solid #e0e0e0;
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            display: none;
         }
-        
-        .payment-method-card:hover {
-            border-color: #3498db;
-            background: #f8f9fa;
+
+        .payment-details.active {
+            display: block;
         }
-        
-        .payment-method-card.selected {
-            border-color: #3498db;
-            background: #e3f2fd;
-        }
-        
+
         .order-summary {
             position: sticky;
             top: 20px;
         }
-        
-        .summary-row {
+
+        .order-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .summary-row.total {
-            font-weight: 600;
-            font-size: 1.2rem;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 15px;
-            margin-top: 15px;
-        }
-        
-        .delivery-time-option {
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-        
-        .delivery-time-option:hover {
-            border-color: #3498db;
-            background: #f8f9fa;
-        }
-        
-        .delivery-time-option.selected {
-            border-color: #3498db;
-            background: #e3f2fd;
-        }
-        
-        .form-floating label {
-            color: #666;
-        }
-        
-        .btn-checkout {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-checkout:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn-checkout:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .loading-spinner {
-            display: none;
-            margin-right: 10px;
-        }
-        
-        .alert-custom {
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .product-item {
-            display: flex;
-            align-items: center;
             padding: 10px 0;
             border-bottom: 1px solid #eee;
         }
-        
-        .product-item img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-right: 15px;
+
+        .order-total {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #3498db;
         }
-        
-        .product-details {
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
             flex: 1;
         }
-        
-        .product-name {
-            font-weight: 600;
-            margin-bottom: 5px;
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3);
         }
-        
-        .product-price {
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.875rem;
+            border-radius: 6px;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .justify-content-between {
+            justify-content: space-between;
+        }
+
+        .align-items-center {
+            align-items: center;
+        }
+
+        .mb-3 {
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .payment-status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .payment-status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .payment-status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .payment-status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .payment-status.active {
+            display: block;
+        }
+
+        .mpesa-instructions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .business-number {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .checkout-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkout-header h1 {
+                font-size: 2em;
+            }
+            
+            .nav-container {
+                padding: 0 15px;
+            }
+            
+            .nav-brand {
+                font-size: 1.2rem;
+            }
+            
+            .close-checkout {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .checkout-wrapper {
+                margin: 10px auto;
+                padding: 0 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .checkout-header {
+                padding: 20px 15px;
+            }
+            
+            .checkout-header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .progress-step::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            right: -50%;
+            height: 2px;
+            background: #ddd;
+            z-index: 1;
+        }
+
+        .progress-step:last-child::before {
+            display: none;
+        }
+
+        .progress-step.active::before {
+            background: #3498db;
+        }
+
+        .progress-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ddd;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            position: relative;
+            z-index: 2;
+            font-weight: bold;
+        }
+
+        .progress-step.active .progress-circle {
+            background: #3498db;
+        }
+
+        .progress-step.completed .progress-circle {
+            background: #27ae60;
+        }
+
+        .progress-label {
+            font-size: 12px;
             color: #666;
         }
-        
-        .product-quantity {
-            color: #888;
-            font-size: 0.9rem;
-        }
-        
-        .delivery-fee-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
-        
-        .estimated-delivery {
-            background: #e8f5e8;
-            color: #2e7d32;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: 500;
+
+        .progress-step.active .progress-label {
+            color: #3498db;
+            font-weight: bold;
         }
     </style>
 </head>
-
 <body>
-    <!-- Header -->
-    <header id="header" class="header d-flex align-items-center">
-        <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
-            <a href="{% url 'index' %}" class="logo d-flex align-items-center">
-                <h1 class="sitename">ZetuMart</h1>
+    <!-- Navigation Header -->
+    <nav class="checkout-nav">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">
+                <i class="bi bi-shop"></i>
+                Zetumart
             </a>
-
-            <nav id="navmenu" class="navmenu">
-                <ul>
-                    <li><a href="{% url 'index' %}">Home</a></li>
-                    <li><a href="{% url 'products' %}">Products</a></li>
-                    <li><a href="{% url 'contact' %}">Contact</a></li>
-                    {% if user.is_authenticated %}
-                        <li><a href="{% url 'profile' %}">Profile</a></li>
-                        <li><a href="{% url 'logout' %}">Logout</a></li>
-                    {% else %}
-                        <li><a href="{% url 'login' %}">Login</a></li>
-                        <li><a href="{% url 'register' %}">Register</a></li>
-                    {% endif %}
-                </ul>
-                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-            </nav>
+            <a href="/" class="close-checkout" onclick="return confirm('Are you sure you want to leave checkout? Your cart will be preserved.')">
+                <i class="bi bi-x-lg"></i>
+                Exit Checkout
+            </a>
         </div>
-    </header>
+    </nav>
 
-    <main class="main">
-        <div class="page-title" data-aos="fade">
-            <div class="container">
-                <nav class="breadcrumbs">
-                    <ol>
-                        <li><a href="{% url 'index' %}">Home</a></li>
-                        <li class="current">Checkout</li>
-                    </ol>
-                </nav>
-                <h1>Checkout</h1>
+    <!-- Main Checkout Content -->
+    <div class="checkout-wrapper">
+        <div class="checkout-container">
+        <div class="checkout-header">
+            <h1>🛒 Checkout</h1>
+            <p>Complete your order securely</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-step active" id="step1">
+                <div class="progress-circle">1</div>
+                <div class="progress-label">Delivery Info</div>
+            </div>
+            <div class="progress-step" id="step2">
+                <div class="progress-circle">2</div>
+                <div class="progress-label">Payment</div>
+            </div>
+            <div class="progress-step" id="step3">
+                <div class="progress-circle">3</div>
+                <div class="progress-label">Confirmation</div>
             </div>
         </div>
 
-        <section id="checkout" class="checkout section">
-            <div class="container">
-                <div class="row">
-                    <!-- Checkout Form -->
-                    <div class="col-lg-8">
-                        <!-- Customer Information -->
-                        <div class="checkout-section">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h3 class="section-title mb-0">
-                                    <i class="bi bi-person-fill me-2"></i>
-                                    Customer Information
-                                </h3>
-                                <button type="button" class="btn btn-outline-secondary" onclick="goBack()">
-                                    <i class="bi bi-arrow-left me-2"></i>Back to Shop
-                                </button>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="firstName" placeholder="First Name" required>
-                                        <label for="firstName">First Name *</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="lastName" placeholder="Last Name" required>
-                                        <label for="lastName">Last Name *</label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-3">
-                                        <input type="email" class="form-control" id="email" placeholder="Email" required>
-                                        <label for="email">Email Address *</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-3">
-                                        <input type="tel" class="form-control" id="phone" placeholder="Phone" pattern="07[0-9]{8}" required>
-                                        <label for="phone">Phone Number *</label>
-                                    </div>
-                                </div>
-                            </div>
+        <div class="checkout-content">
+            <div class="checkout-form">
+                <form id="checkoutForm">
+                    <!-- Delivery Information -->
+                    <div class="section" id="deliverySection">
+                        <h2>📍 Delivery Information</h2>
+                        
+                        <div class="form-group">
+                            <label for="customer_name">Full Name *</label>
+                            <input type="text" id="customer_name" name="customer_name" required>
                         </div>
 
-                        <!-- Delivery Information -->
-                        <div class="checkout-section">
-                            <h3 class="section-title">
-                                <i class="bi bi-truck me-2"></i>
-                                Delivery Information
-                            </h3>
-                            
-                            <!-- County Selection -->
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Select County *</label>
-                                <div class="search-dropdown">
-                                    <input 
-                                        type="text" 
-                                        class="search-input" 
-                                        id="countySearch" 
-                                        placeholder="Type to search counties..."
-                                        autocomplete="off"
-                                    >
-                                    <div class="search-results" id="countySearchResults"></div>
-                                </div>
-                                <input type="hidden" id="selectedCountyKey" value="">
-                                <input type="hidden" id="selectedCountyName" value="">
-                            </div>
-                            
-                            <!-- Town Selection -->
-                            <div class="mb-4" id="townSection" style="display: none;">
-                                <label class="form-label fw-bold">Select Town/City *</label>
-                                <div class="search-dropdown">
-                                    <input 
-                                        type="text" 
-                                        class="search-input" 
-                                        id="citySearch" 
-                                        placeholder="Type to search cities..."
-                                        autocomplete="off"
-                                        disabled
-                                    >
-                                    <div class="search-results" id="citySearchResults"></div>
-                                </div>
-                                <input type="hidden" id="selectedCityName" value="">
-                                <div class="loading-spinner" id="cityLoadingSpinner">
-                                    <i class="bi bi-arrow-repeat"></i> Loading cities...
-                                </div>
-                            </div>
-                            
-                            <!-- Delivery Point -->
-                            <div class="form-floating mb-3">
-                                <textarea class="form-control" id="deliveryPoint" placeholder="Delivery Point" style="height: 100px" required></textarea>
-                                <label for="deliveryPoint">Specific Delivery Point (Estate, Building Name, Landmark) *</label>
-                            </div>
-                            
-                            <!-- Delivery Method -->
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Delivery Method *</label>
-                                <div class="delivery-time-option" data-method="home">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="deliveryMethod" id="homeDelivery" value="home" checked>
-                                        <label class="form-check-label" for="homeDelivery">
-                                            <strong>Home Delivery</strong>
-                                            <div class="text-muted small">Delivered to your doorstep</div>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="delivery-time-option" data-method="office">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="deliveryMethod" id="officeDelivery" value="office">
-                                        <label class="form-check-label" for="officeDelivery">
-                                            <strong>Office Delivery</strong>
-                                            <div class="text-muted small">Delivered to your office</div>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="delivery-time-option" data-method="pickup">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="deliveryMethod" id="pickupStation" value="pickup">
-                                        <label class="form-check-label" for="pickupStation">
-                                            <strong>Pickup Station</strong>
-                                            <div class="text-muted small">Collect from designated pickup point</div>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Delivery Time -->
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Preferred Delivery Time</label>
-                                <select class="form-select" id="deliveryTime">
-                                    <option value="anytime">Anytime</option>
-                                    <option value="morning">Morning (8AM - 12PM)</option>
-                                    <option value="afternoon">Afternoon (12PM - 5PM)</option>
-                                    <option value="evening">Evening (5PM - 8PM)</option>
-                                </select>
-                            </div>
-                            
-                            <!-- Delivery Instructions -->
-                            <div class="form-floating mb-3">
-                                <textarea class="form-control" id="deliveryInstructions" placeholder="Delivery Instructions" style="height: 80px"></textarea>
-                                <label for="deliveryInstructions">Additional Delivery Instructions (Optional)</label>
-                            </div>
-                            
-                            <!-- Delivery Fee Info -->
-                            <div class="delivery-fee-info" id="deliveryFeeInfo">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span><strong>Delivery Fee:</strong></span>
-                                    <span id="deliveryFeeAmount">KSh 0</span>
-                                </div>
-                                <div class="estimated-delivery mt-2" id="estimatedDelivery">
-                                    Select delivery location to see estimated delivery time
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label for="customer_email">Email Address *</label>
+                            <input type="email" id="customer_email" name="customer_email" required>
                         </div>
 
-                        <!-- Payment Method -->
-                        <div class="checkout-section">
-                            <h3 class="section-title">
-                                <i class="bi bi-credit-card me-2"></i>
-                                Payment Method
-                            </h3>
-                            
-                            <div id="paymentMethods">
-                                <!-- M-Pesa STK Push -->
-                                <div class="payment-method-card" data-method="mpesa">
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" name="paymentMethod" id="mpesaStk" value="mpesa" class="form-check-input me-3">
-                                        <div class="flex-grow-1">
-                                            <h5 class="mb-1">M-Pesa STK Push</h5>
-                                            <p class="mb-0 text-muted">Pay via M-Pesa on your mobile phone</p>
-                                        </div>
-                                        <i class="bi bi-phone fs-3 text-success"></i>
-                                    </div>
-                                </div>
-                                
-                                <!-- M-Pesa Till/PayBill -->
-                                <div class="payment-method-card" data-method="till">
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" name="paymentMethod" id="mpesaTill" value="till" class="form-check-input me-3">
-                                        <div class="flex-grow-1">
-                                            <h5 class="mb-1">M-Pesa Till/PayBill</h5>
-                                            <p class="mb-0 text-muted">Manual payment via Till or PayBill number</p>
-                                        </div>
-                                        <i class="bi bi-receipt fs-3 text-primary"></i>
-                                    </div>
-                                </div>
-                                
-                                <!-- Pay on Delivery -->
-                                <div class="payment-method-card" data-method="cod">
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" name="paymentMethod" id="payOnDelivery" value="cod" class="form-check-input me-3">
-                                        <div class="flex-grow-1">
-                                            <h5 class="mb-1">Pay on Delivery</h5>
-                                            <p class="mb-0 text-muted">Cash payment when you receive your order</p>
-                                        </div>
-                                        <i class="bi bi-cash fs-3 text-warning"></i>
-                                    </div>
-                                </div>
-                                
-                                <!-- Lipa Mdogo Mdogo -->
-                                <div class="payment-method-card" data-method="polepole">
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" name="paymentMethod" id="lipaMdogo" value="polepole" class="form-check-input me-3">
-                                        <div class="flex-grow-1">
-                                            <h5 class="mb-1">Lipa Mdogo Mdogo</h5>
-                                            <p class="mb-0 text-muted">Pay in flexible installments</p>
-                                        </div>
-                                        <i class="bi bi-calendar-check fs-3 text-info"></i>
-                                    </div>
-                                </div>
-                                
-                                <!-- Card Payment -->
-                                <div class="payment-method-card" data-method="card">
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" name="paymentMethod" id="cardPayment" value="card" class="form-check-input me-3">
-                                        <div class="flex-grow-1">
-                                            <h5 class="mb-1">Debit/Credit Card</h5>
-                                            <p class="mb-0 text-muted">Visa & MasterCard accepted</p>
-                                        </div>
-                                        <i class="bi bi-credit-card-2-front fs-3 text-danger"></i>
-                                    </div>
-                                </div>
-                                
-                                <!-- PayPal -->
-                                <div class="payment-method-card" data-method="paypal">
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" name="paymentMethod" id="paypalPayment" value="paypal" class="form-check-input me-3">
-                                        <div class="flex-grow-1">
-                                            <h5 class="mb-1">PayPal</h5>
-                                            <p class="mb-0 text-muted">International payments</p>
-                                        </div>
-                                        <i class="bi bi-paypal fs-3 text-primary"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Payment Details (shown based on selection) -->
-                            <div id="paymentDetails" style="display: none;">
-                                <!-- Payment details will be populated based on selection -->
-                            </div>
+                        <div class="form-group">
+                            <label for="customer_phone">Phone Number *</label>
+                            <input type="tel" id="customer_phone" name="customer_phone" placeholder="07XXXXXXXX or 2547XXXXXXXX" required>
                         </div>
+
+                        <div class="form-group">
+                            <label for="delivery_county">County *</label>
+                            <select id="delivery_county" name="delivery_county" required>
+                                <option value="">Select County</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="delivery_town">Town/City *</label>
+                            <select id="delivery_town" name="delivery_town" required>
+                                <option value="">Select Town</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="delivery_method">Delivery Method *</label>
+                            <select id="delivery_method" name="delivery_method" required>
+                                <option value="">Select Delivery Method</option>
+                                <option value="home">Home Delivery</option>
+                                <option value="office">Office Delivery</option>
+                                <option value="pickup">Pickup Station</option>
+                            </select>
+                        </div>
+
+                        <button type="button" class="btn btn-primary" onclick="proceedToPayment()">Continue to Payment</button>
                     </div>
 
-                    <!-- Order Summary -->
-                    <div class="col-lg-4">
-                        <div class="order-summary checkout-section">
-                            <h3 class="section-title">
-                                <i class="bi bi-cart-check me-2"></i>
-                                Order Summary
-                            </h3>
-                            
-                            <div id="orderItems">
-                                <!-- Cart items will be populated by JavaScript -->
+                    <!-- Payment Information -->
+                    <div class="section" id="paymentSection" style="display: none;">
+                        <h2>💳 Payment Method</h2>
+                        
+                        <div class="payment-methods">
+                            <div class="payment-method" onclick="selectPaymentMethod('mpesa_stk')">
+                                <label style="cursor: pointer;">
+                                    <input type="radio" name="payment_method" value="mpesa_stk">
+                                    <strong>M-Pesa STK Push</strong>
+                                    <p style="margin: 5px 0; color: #666;">Pay directly via M-Pesa on your phone</p>
+                                </label>
                             </div>
-                            
-                            <div class="summary-row">
-                                <span>Subtotal:</span>
-                                <span id="subtotal">KSh 0</span>
+
+                            <div class="payment-method" onclick="selectPaymentMethod('mpesa_paybill')">
+                                <label style="cursor: pointer;">
+                                    <input type="radio" name="payment_method" value="mpesa_paybill">
+                                    <strong>M-Pesa Paybill</strong>
+                                    <p style="margin: 5px 0; color: #666;">Pay via M-Pesa Paybill Number</p>
+                                </label>
                             </div>
-                            
-                            <div class="summary-row">
-                                <span>Delivery Fee:</span>
-                                <span id="deliveryFee">KSh 0</span>
+
+                            <div class="payment-method" onclick="selectPaymentMethod('mpesa_till')">
+                                <label style="cursor: pointer;">
+                                    <input type="radio" name="payment_method" value="mpesa_till">
+                                    <strong>M-Pesa Till Number</strong>
+                                    <p style="margin: 5px 0; color: #666;">Pay via M-Pesa Till Number</p>
+                                </label>
                             </div>
-                            
-                            <div class="summary-row total">
-                                <span>Total:</span>
-                                <span id="totalAmount">KSh 0</span>
+
+                            <div class="payment-method" onclick="selectPaymentMethod('mpesa_pochi')">
+                                <label style="cursor: pointer;">
+                                    <input type="radio" name="payment_method" value="mpesa_pochi">
+                                    <strong>M-Pesa Pochi la Biashara</strong>
+                                    <p style="margin: 5px 0; color: #666;">Pay via Pochi la Biashara</p>
+                                </label>
                             </div>
-                            
-                            <button class="btn btn-checkout mt-4" id="placeOrderBtn" disabled>
-                                <span class="loading-spinner">
-                                    <i class="bi bi-arrow-repeat"></i>
-                                </span>
-                                Place Order
-                            </button>
-                            
-                            <div class="alert alert-info mt-3" id="checkoutAlert" style="display: none;">
-                                <!-- Alert messages will be shown here -->
+
+                            <div class="payment-method" onclick="selectPaymentMethod('cod')">
+                                <label style="cursor: pointer;">
+                                    <input type="radio" name="payment_method" value="cod">
+                                    <strong>Pay on Delivery</strong>
+                                    <p style="margin: 5px 0; color: #666;">Pay when you receive your order</p>
+                                </label>
                             </div>
+                        </div>
+
+                        <!-- STK Push Payment Details -->
+                        <div class="payment-details" id="mpesa_stk_details">
+                            <h4>M-Pesa STK Push</h4>
+                            <div class="form-group">
+                                <label for="mpesa_phone">M-Pesa Phone Number *</label>
+                                <input type="tel" id="mpesa_phone" name="mpesa_phone" placeholder="07XXXXXXXX or 2547XXXXXXXX" required>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-primary" onclick="initiateSTKPush()" id="stkPushBtn">Send STK Push</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelSTKPush()" id="stkCancelBtn" style="display: none;">Cancel Payment</button>
+                            </div>
+                        </div>
+
+                        <!-- Paybill Payment Details -->
+                        <div class="payment-details" id="mpesa_paybill_details">
+                            <h4>M-Pesa Paybill Payment</h4>
+                            <div class="mpesa-instructions">
+                                <p><strong>Paybill Number:</strong> <span class="business-number">123456</span></p>
+                                <p><strong>Account Number:</strong> Your Order ID (will be shown after order placement)</p>
+                                <p>After payment, enter the M-Pesa transaction code below.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="paybill_transaction_code">M-Pesa Transaction Code *</label>
+                                <input type="text" id="paybill_transaction_code" name="paybill_transaction_code" placeholder="Enter M-Pesa transaction code">
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="verifyTransactionCode()">Verify Payment</button>
+                        </div>
+
+                        <!-- Till Payment Details -->
+                        <div class="payment-details" id="mpesa_till_details">
+                            <h4>M-Pesa Till Payment</h4>
+                            <div class="mpesa-instructions">
+                                <p><strong>Till Number:</strong> <span class="business-number">987654</span></p>
+                                <p><strong>Account Number:</strong> Your Order ID (will be shown after order placement)</p>
+                                <p>After payment, enter the M-Pesa transaction code below.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="till_transaction_code">M-Pesa Transaction Code *</label>
+                                <input type="text" id="till_transaction_code" name="till_transaction_code" placeholder="Enter M-Pesa transaction code">
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="verifyTransactionCode()">Verify Payment</button>
+                        </div>
+
+                        <!-- Pochi Payment Details -->
+                        <div class="payment-details" id="mpesa_pochi_details">
+                            <h4>M-Pesa Pochi la Biashara</h4>
+                            <div class="mpesa-instructions">
+                                <p><strong>Pochi Number:</strong> <span class="business-number">0712345678</span></p>
+                                <p><strong>Account Number:</strong> Your Order ID (will be shown after order placement)</p>
+                                <p>After payment, enter the M-Pesa transaction code below.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="pochi_transaction_code">M-Pesa Transaction Code *</label>
+                                <input type="text" id="pochi_transaction_code" name="pochi_transaction_code" placeholder="Enter M-Pesa transaction code">
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="verifyTransactionCode()">Verify Payment</button>
+                        </div>
+
+                        <!-- Pay on Delivery Details -->
+                        <div class="payment-details" id="cod_details">
+                            <h4>Pay on Delivery</h4>
+                            <p>You will pay the full amount when your order is delivered. No additional payment required now.</p>
+                            <button type="button" class="btn btn-primary" onclick="placeOrder()">Place Order</button>
+                        </div>
+
+                        <div class="payment-status" id="paymentStatus"></div>
+                        <div class="loading" id="paymentLoading">
+                            <div class="spinner"></div>
+                            <p>Processing payment...</p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="order-summary">
+                <div class="section">
+                    <h2>📦 Order Summary</h2>
+                    <div id="cartItems">
+                        <!-- Cart items will be populated here -->
+                    </div>
+                    <div class="order-item">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">KES 0.00</span>
+                    </div>
+                    <div class="order-item">
+                        <span>Delivery Fee:</span>
+                        <span id="deliveryFee">KES 0.00</span>
+                    </div>
+                    <div class="order-total">
+                        <div class="order-item">
+                            <span>Total:</span>
+                            <span id="totalAmount">KES 0.00</span>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-    </main>
 
-    <!-- Footer -->
-    <footer id="footer" class="footer">
-        <div class="container footer-top">
-            <div class="row gy-4">
-                <div class="col-lg-4 col-md-12 footer-about">
-                    <a href="{% url 'index' %}" class="logo d-flex align-items-center">
-                        <span class="sitename">ZetuMart</span>
-                    </a>
-                    <p>Your trusted online shopping destination in Kenya.</p>
-                </div>
-                
-                <div class="col-lg-4 col-md-12 footer-contact text-center">
-                    <h4>Contact Us</h4>
-                    <p>Phone: +254 700 000000</p>
-                    <p>Email: info@zetumart.co.ke</p>
-                </div>
-                
-                <div class="col-lg-4 col-md-12 footer-links">
-                    <h4>Useful Links</h4>
-                    <ul>
-                        <li><a href="{% url 'index' %}">Home</a></li>
-                        <li><a href="{% url 'products' %}">Products</a></li>
-                        <li><a href="{% url 'contact' %}">Contact</a></li>
-                        <li><a href="{% url 'customer_care' %}">Customer Care</a></li>
-                    </ul>
+                <div class="section" id="orderConfirmation" style="display: none;">
+                    <h2>✅ Order Confirmation</h2>
+                    <div id="confirmationDetails">
+                        <!-- Order confirmation details will be shown here -->
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="container">
-            <div class="copyright">
-                &copy; 2024 ZetuMart. All Rights Reserved.
-            </div>
-        </div>
-    </footer>
+    </div>
 
-    <!-- Vendor JS Files -->
-    <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
-    <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
-    <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
-
-    <!-- Main JS File -->
-    <script src="{% static 'assets/js/main.js' %}"></script>
-    
-    <!-- Checkout JavaScript -->
     <script>
-        // Dynamic Delivery System
-        let selectedCountyKey = '';
-        let selectedCountyName = '';
-        let selectedCityName = '';
-        let cartItems = [];
-        let subtotal = 0;
-        let deliveryFee = 0;
-        let totalAmount = 0;
-        let deliveryInfo = null;
+        let currentOrder = null;
+        let paymentPollingInterval = null;
+        let processedCartItems = null; // Store processed cart data
 
-        // Initialize checkout
+        // Load cart data on page load
         document.addEventListener('DOMContentLoaded', function() {
-            loadCartItems();
-            setupDeliverySearch();
-            setupEventListeners();
-            updateOrderSummary();
+            loadCartData();
+            loadCounties();
         });
 
-        // Setup delivery search functionality
-        function setupDeliverySearch() {
-            const countySearch = document.getElementById('countySearch');
-            const citySearch = document.getElementById('citySearch');
-            const countyResults = document.getElementById('countySearchResults');
-            const cityResults = document.getElementById('citySearchResults');
+        async function loadCartData() {
+            const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+            const cartItemsContainer = document.getElementById('cartItems');
             
-            // County search
-            let countySearchTimeout;
-            countySearch.addEventListener('input', function() {
-                clearTimeout(countySearchTimeout);
-                const query = this.value.trim();
-                
-                if (query.length < 2) {
-                    countyResults.style.display = 'none';
-                    return;
-                }
-                
-                countySearchTimeout = setTimeout(() => {
-                    searchCounties(query);
-                }, 300);
-            });
-            
-            // City search
-            let citySearchTimeout;
-            citySearch.addEventListener('input', function() {
-                clearTimeout(citySearchTimeout);
-                const query = this.value.trim();
-                
-                if (query.length < 2 || !selectedCountyKey) {
-                    cityResults.style.display = 'none';
-                    return;
-                }
-                
-                citySearchTimeout = setTimeout(() => {
-                    searchCities(selectedCountyKey, query);
-                }, 300);
-            });
-            
-            // Close search results when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.search-dropdown')) {
-                    countyResults.style.display = 'none';
-                    cityResults.style.display = 'none';
-                }
-            });
-        }
-        
-        // Search counties
-        async function searchCounties(query) {
-            try {
-                const response = await fetch(`/api/delivery/search-counties/?q=${encodeURIComponent(query)}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    displayCountyResults(data.counties);
-                }
-            } catch (error) {
-                console.error('Error searching counties:', error);
-            }
-        }
-        
-        // Search cities
-        async function searchCities(countyKey, query) {
-            try {
-                const response = await fetch(`/api/delivery/get-cities/?county=${encodeURIComponent(countyKey)}&q=${encodeURIComponent(query)}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    displayCityResults(data.cities);
-                }
-            } catch (error) {
-                console.error('Error searching cities:', error);
-            }
-        }
-        
-        // Display county search results
-        function displayCountyResults(counties) {
-            const resultsContainer = document.getElementById('countySearchResults');
-            resultsContainer.innerHTML = '';
-            
-            if (counties.length === 0) {
-                resultsContainer.innerHTML = '<div class="search-result-item">No counties found</div>';
-            } else {
-                counties.forEach(county => {
-                    const item = document.createElement('div');
-                    item.className = 'search-result-item';
-                    item.textContent = county.display_name;
-                    item.addEventListener('click', () => selectCounty(county.key, county.display_name));
-                    resultsContainer.appendChild(item);
-                });
-            }
-            
-            resultsContainer.style.display = 'block';
-        }
-        
-        // Display city search results
-        function displayCityResults(cities) {
-            const resultsContainer = document.getElementById('citySearchResults');
-            resultsContainer.innerHTML = '';
-            
-            if (cities.length === 0) {
-                resultsContainer.innerHTML = '<div class="search-result-item">No cities found</div>';
-            } else {
-                cities.forEach(city => {
-                    const item = document.createElement('div');
-                    item.className = 'search-result-item';
-                    item.textContent = city;
-                    item.addEventListener('click', () => selectCity(city));
-                    resultsContainer.appendChild(item);
-                });
-            }
-            
-            resultsContainer.style.display = 'block';
-        }
-        
-        // Select county
-        async function selectCounty(countyKey, countyName) {
-            selectedCountyKey = countyKey;
-            selectedCountyName = countyName;
-            
-            // Update UI
-            document.getElementById('countySearch').value = countyName;
-            document.getElementById('selectedCountyKey').value = countyKey;
-            document.getElementById('selectedCountyName').value = countyName;
-            document.getElementById('countySearchResults').style.display = 'none';
-            
-            // Clear city selection
-            selectedCityName = '';
-            document.getElementById('citySearch').value = '';
-            document.getElementById('selectedCityName').value = '';
-            document.getElementById('citySearchResults').style.display = 'none';
-            
-            // Show town section and enable city search
-            document.getElementById('townSection').style.display = 'block';
-            document.getElementById('citySearch').disabled = false;
-            document.getElementById('cityLoadingSpinner').style.display = 'block';
-            
-            // Load cities for this county
-            try {
-                const response = await fetch(`/api/delivery/get-cities/?county=${encodeURIComponent(countyKey)}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Store cities for future reference
-                    window.currentCities = data.cities;
-                }
-            } catch (error) {
-                console.error('Error loading cities:', error);
-            } finally {
-                document.getElementById('cityLoadingSpinner').style.display = 'none';
-            }
-            
-            // Reset delivery info
-            deliveryInfo = null;
-            updateDeliveryInfo();
-        }
-        
-        // Select city
-        async function selectCity(cityName) {
-            selectedCityName = cityName;
-            
-            // Update UI
-            document.getElementById('citySearch').value = cityName;
-            document.getElementById('selectedCityName').value = cityName;
-            document.getElementById('citySearchResults').style.display = 'none';
-            
-            // Get delivery information
-            await updateDeliveryInfo();
-        }
-        
-        // Update delivery information
-        async function updateDeliveryInfo() {
-            if (!selectedCountyKey || !selectedCityName) {
-                deliveryFee = 0;
-                document.getElementById('deliveryFeeAmount').textContent = 'KSh 0';
-                document.getElementById('estimatedDelivery').textContent = 'Select delivery location to see estimated delivery time';
-                updateOrderSummary();
+            // Check if container exists
+            if (!cartItemsContainer) {
+                console.error('Cart items container not found!');
                 return;
             }
             
-            try {
-                const response = await fetch(`/api/delivery/get-info/?county=${encodeURIComponent(selectedCountyKey)}&city=${encodeURIComponent(selectedCityName)}&order_amount=${subtotal}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    deliveryInfo = data.delivery_info;
-                    deliveryFee = data.delivery_fee;
-                    
-                    // Update UI
-                    document.getElementById('deliveryFeeAmount').textContent = `KSh ${deliveryFee.toLocaleString()}`;
-                    
-                    const estimatedDate = new Date(data.estimated_date);
-                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                    document.getElementById('estimatedDelivery').textContent = `Estimated delivery: ${estimatedDate.toLocaleDateString('en-US', options)}`;
-                    
-                    updateOrderSummary();
+            if (!cartItems || cartItems.length === 0) {
+                cartItemsContainer.innerHTML = '<p style="text-align: center; color: #666;">Your cart is empty</p>';
+                const subtotalElement = document.getElementById('subtotal');
+                if (subtotalElement) {
+                    subtotalElement.textContent = 'KES 0.00';
                 }
-            } catch (error) {
-                console.error('Error getting delivery info:', error);
-            }
-        }
-
-        // Load cart items from localStorage
-        function loadCartItems() {
-            try {
-                cartItems = JSON.parse(localStorage.getItem('zetumart_cart_v1') || '[]');
-                
-                // Check if cart is empty
-                if (cartItems.length === 0) {
-                    showAlert('Your cart is empty. Please add items before checkout.', 'warning');
-                    // Redirect to home page after 3 seconds
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 3000);
-                    return;
-                }
-                
-                renderCartItems();
-            } catch (error) {
-                console.error('Error loading cart:', error);
-                showAlert('Error loading cart items', 'danger');
-            }
-        }
-
-        // Render cart items in order summary
-        function renderCartItems() {
-            const container = document.getElementById('orderItems');
-            container.innerHTML = '';
-            
-            if (cartItems.length === 0) {
-                container.innerHTML = '<p class="text-muted">Your cart is empty</p>';
+                updateOrderSummary(0, 0);
                 return;
             }
             
-            subtotal = 0;
-            
+            let subtotal = 0;
+            let itemsHTML = '';
+
             cartItems.forEach(item => {
-                const itemTotal = (item.price || 0) * (item.qty || 1);
+                console.log('Processing cart item:', item);
+                
+                const itemPrice = parseFloat(item.price) || 0;
+                const itemQuantity = parseInt(item.quantity) || 1;
+                const itemTotal = itemPrice * itemQuantity;
                 subtotal += itemTotal;
                 
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'product-item';
-                itemDiv.innerHTML = `
-                    <img src="${item.image || '/static/assets/img/product-placeholder.jpg'}" alt="${item.name}">
-                    <div class="product-details">
-                        <div class="product-name">${item.name}</div>
-                        <div class="product-price">KSh ${(item.price || 0).toLocaleString()}</div>
-                        <div class="product-quantity">Quantity: ${item.qty || 1}</div>
-                    </div>
-                    <div class="product-total">
-                        <strong>KSh ${itemTotal.toLocaleString()}</strong>
+                console.log(`Item ${item.name}: Price=${itemPrice}, Qty=${itemQuantity}, Total=${itemTotal}`);
+                
+                itemsHTML += `
+                    <div class="order-item">
+                        <div>
+                            <strong>${item.name || 'Unknown Product'}</strong><br>
+                            <small>Quantity: ${itemQuantity} × KES ${itemPrice.toFixed(2)}</small>
+                        </div>
+                        <span>KES ${itemTotal.toFixed(2)}</span>
                     </div>
                 `;
-                container.appendChild(itemDiv);
             });
-        }
+            
+            console.log('Final subtotal calculated:', subtotal);
 
-        // Setup event listeners
-        function setupEventListeners() {
-            // Delivery method selection
-            document.querySelectorAll('input[name="deliveryMethod"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    document.querySelectorAll('.delivery-time-option').forEach(option => {
-                        option.classList.remove('selected');
-                    });
-                    this.closest('.delivery-time-option').classList.add('selected');
-                    validateForm();
-                });
-            });
+            cartItemsContainer.innerHTML = itemsHTML;
             
-            // Payment method selection
-            document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    document.querySelectorAll('.payment-method-card').forEach(card => {
-                        card.classList.remove('selected');
-                    });
-                    this.closest('.payment-method-card').classList.add('selected');
-                    showPaymentDetails(this.value);
-                    validateForm();
-                });
-            });
-            
-            // Form validation
-            const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'deliveryPoint'];
-            requiredFields.forEach(fieldId => {
-                document.getElementById(fieldId).addEventListener('input', validateForm);
-            });
-            
-            // Add delivery fields to validation
-            document.getElementById('countySearch').addEventListener('input', validateForm);
-            document.getElementById('citySearch').addEventListener('input', validateForm);
-            
-            // Place order button
-            document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
-        }
-
-        // Show payment details based on method
-        function showPaymentDetails(method) {
-            const container = document.getElementById('paymentDetails');
-            container.style.display = 'block';
-            container.innerHTML = '';
-            
-            switch(method) {
-                case 'mpesa':
-                    container.innerHTML = `
-                        <div class="alert alert-info">
-                            <h6>M-Pesa STK Push Payment</h6>
-                            <p>You will receive an M-Pesa prompt on your phone to complete payment.</p>
-                            <div class="form-floating mb-3">
-                                <input type="tel" class="form-control" id="mpesaPhone" placeholder="M-Pesa Phone" pattern="07[0-9]{8}" required>
-                                <label for="mpesaPhone">M-Pesa Phone Number *</label>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'till':
-                    container.innerHTML = `
-                        <div class="alert alert-info">
-                            <h6>M-Pesa Till/PayBill Payment</h6>
-                            <p><strong>Till Number:</strong> 123456</p>
-                            <p><strong>PayBill Number:</strong> 123456</p>
-                            <p><strong>Account Number:</strong> Your order ID</p>
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="transactionCode" placeholder="Transaction Code" required>
-                                <label for="transactionCode">M-Pesa Transaction Code *</label>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'polepole':
-                    container.innerHTML = `
-                        <div class="alert alert-info">
-                            <h6>Lipa Mdogo Mdogo - Flexible Installments</h6>
-                            <p>Pay in convenient installments:</p>
-                            <ul>
-                                <li>30% upfront (KSh ${Math.round(totalAmount * 0.3).toLocaleString()})</li>
-                                <li>Remaining 70% split over 3 months</li>
-                                <li>Monthly payment: KSh ${Math.round(totalAmount * 0.7 / 3).toLocaleString()}</li>
-                            </ul>
-                            <div class="form-floating mb-3">
-                                <select class="form-select" id="installmentPlan">
-                                    <option value="3months">3 Months</option>
-                                    <option value="6months">6 Months</option>
-                                    <option value="12months">12 Months</option>
-                                </select>
-                                <label for="installmentPlan">Installment Plan</label>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'card':
-                    container.innerHTML = `
-                        <div class="alert alert-info">
-                            <h6>Card Payment</h6>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="cardNumber" placeholder="Card Number" maxlength="19" required>
-                                        <label for="cardNumber">Card Number *</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" maxlength="5" required>
-                                        <label for="expiryDate">Expiry Date *</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="cvv" placeholder="CVV" maxlength="4" required>
-                                        <label for="cvv">CVV *</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'paypal':
-                    container.innerHTML = `
-                        <div class="alert alert-info">
-                            <h6>PayPal Payment</h6>
-                            <p>You will be redirected to PayPal to complete your payment.</p>
-                            <p>PayPal accepts Visa, MasterCard, and international payment methods.</p>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'cod':
-                    container.innerHTML = `
-                        <div class="alert alert-warning">
-                            <h6>Pay on Delivery</h6>
-                            <p>Please have the exact amount ready when your order arrives.</p>
-                            <p>Delivery person will accept cash only.</p>
-                        </div>
-                    `;
-                    break;
+            // Update subtotal with error checking
+            const subtotalElement = document.getElementById('subtotal');
+            if (subtotalElement) {
+                subtotalElement.textContent = `KES ${subtotal.toFixed(2)}`;
+            } else {
+                console.error('Subtotal element not found!');
             }
-        }
-
-        // Update order summary
-        function updateOrderSummary() {
-            document.getElementById('subtotal').textContent = `KSh ${subtotal.toLocaleString()}`;
-            document.getElementById('deliveryFee').textContent = `KSh ${deliveryFee.toLocaleString()}`;
-            totalAmount = subtotal + deliveryFee;
-            document.getElementById('total').textContent = `KSh ${totalAmount.toLocaleString()}`;
-        }
-
-        // Show alert
-        function showAlert(message, type = 'info') {
-            const alert = document.getElementById('checkoutAlert');
-            alert.className = `alert alert-${type} alert-custom`;
-            alert.textContent = message;
-            alert.style.display = 'block';
             
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
+            updateOrderSummary(subtotal, 0);
+            
+            // Store for use in createOrder
+            window.processedCartItems = cartItems;
         }
 
-        // Validate form
-        function validateForm() {
+        function loadCounties() {
+            const counties = [
+                'Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 
+                'Kisii', 'Kakamega', 'Bungoma', 'Busia', 'Siaya',
+                'Homa Bay', 'Migori', 'Kericho', 'Bomet', 'Narok',
+                'Kajiado', 'Kitui', 'Machakos', 'Makueni', 'Meru',
+                'Embu', 'Tharaka Nithi', 'Nyeri', 'Kirinyaga', 'Muranga',
+                'Kiambu', 'Turkana', 'West Pokot', 'Samburu', 'Trans Nzoia',
+                'Uasin Gishu', 'Elgeyo Marakwet', 'Nandi', 'Baringo', 'Laikipia',
+                'Nyandarua', 'Taita Taveta', 'Kwale', 'Kilifi', 'Tana River',
+                'Lamu', 'Garissa', 'Wajir', 'Mandera', 'Marsabit', 'Isiolo'
+            ];
+
+            const countySelect = document.getElementById('delivery_county');
+            counties.forEach(county => {
+                const option = document.createElement('option');
+                option.value = county;
+                option.textContent = county;
+                countySelect.appendChild(option);
+            });
+
+            countySelect.addEventListener('change', loadTowns);
+        }
+
+        function loadTowns() {
+            const county = document.getElementById('delivery_county').value;
+            const townSelect = document.getElementById('delivery_town');
+            
+            // Clear existing options
+            townSelect.innerHTML = '<option value="">Select Town</option>';
+
+            if (!county) return;
+
+            // Sample towns based on county (in real app, this would come from API)
+            const towns = {
+                'Nairobi': ['Nairobi CBD', 'Westlands', 'Karen', 'Langata', 'Embakasi', 'Kasarani', 'Dagoretti', 'Kibra', 'Ruaraka', 'Mathare'],
+                'Mombasa': ['Mombasa Island', 'Likoni', 'Changamwe', 'Kisauni', 'Nyali', 'Jomvu', 'Mvita'],
+                'Kisumu': ['Kisumu CBD', 'Kondele', 'Manyatta', 'Nyalenda', 'Obunga', 'Dunga'],
+                'Nakuru': ['Nakuru CBD', 'Kaptembwo', 'London', 'Kiamaina', 'Bahati', 'Nakuru West'],
+                'Eldoret': ['Eldoret CBD', 'Kipkaren', 'Huruma', 'Kimumu', 'Langas', 'Pioneer'],
+                'Default': ['Town Center', 'Market Area', 'Industrial Area', 'Residential Area']
+            };
+
+            const selectedTowns = towns[county] || towns['Default'];
+            selectedTowns.forEach(town => {
+                const option = document.createElement('option');
+                option.value = town;
+                option.textContent = town;
+                townSelect.appendChild(option);
+            });
+
+            // Calculate delivery fee when town is selected
+            townSelect.addEventListener('change', calculateDeliveryFee);
+        }
+
+        function calculateDeliveryFee() {
+            const county = document.getElementById('delivery_county').value;
+            const town = document.getElementById('delivery_town').value;
+            
+            if (!county || !town) return;
+
+            // Simple delivery fee calculation (in real app, this would come from API)
+            let deliveryFee = 200; // Base fee
+            
+            // Higher fees for major cities
+            if (['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret'].includes(county)) {
+                deliveryFee = 150;
+            }
+            
+            // Additional fees for remote areas
+            if (['Turkana', 'Mandera', 'Wajir', 'Marsabit', 'Garissa'].includes(county)) {
+                deliveryFee = 500;
+            }
+
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('KES ', ''));
+            updateOrderSummary(subtotal, deliveryFee);
+        }
+
+        async function fetchProductDetails(productIds) {
+            console.log('Fetching product details for IDs:', productIds);
+            try {
+                const response = await fetch('/api/products/details/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ product_ids: productIds })
+                });
+                
+                console.log('API response status:', response.status);
+                console.log('API response ok:', response.ok);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('API response data:', result);
+                    
+                    if (result.success) {
+                        const products = result.products.map(product => ({
+                            ...product,
+                            quantity: 1 // Default quantity for ID-based cart
+                        }));
+                        console.log('Processed products:', products);
+                        return products;
+                    } else {
+                        console.error('API returned error:', result.error);
+                    }
+                } else {
+                    console.error('API request failed with status:', response.status);
+                }
+            } catch (error) {
+                console.error('Error fetching product details:', error);
+            }
+            
+            // Fallback: create dummy items if API fails
+            console.log('Using fallback dummy items');
+            return productIds.map(id => ({
+                id: id,
+                name: `Product ${id}`,
+                price: 0,
+                quantity: 1
+            }));
+        }
+
+        function updateOrderSummary(subtotal, deliveryFee) {
+            const total = subtotal + deliveryFee;
+            document.getElementById('deliveryFee').textContent = `KES ${deliveryFee.toFixed(2)}`;
+            document.getElementById('totalAmount').textContent = `KES ${total.toFixed(2)}`;
+        }
+
+        function proceedToPayment() {
+            // Validate delivery form
+            const form = document.getElementById('checkoutForm');
+            const deliveryInputs = form.querySelectorAll('#deliverySection input[required], #deliverySection select[required]');
+            
             let isValid = true;
-            
-            // Check customer info fields
-            const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'deliveryPoint'];
-            requiredFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (!field.value.trim()) {
+            deliveryInputs.forEach(input => {
+                if (!input.value.trim()) {
                     isValid = false;
+                    input.style.borderColor = 'red';
+                } else {
+                    input.style.borderColor = '#ddd';
                 }
             });
-            
-            // Check delivery location
-            if (!selectedCountyKey || !selectedCityName) {
-                isValid = false;
-            }
-            
-            // Check payment method
-            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-            if (!paymentMethod) {
-                isValid = false;
-            }
-            
-            // Check if cart has items
-            if (cartItems.length === 0) {
-                isValid = false;
-            }
-            
-            document.getElementById('placeOrderBtn').disabled = !isValid;
-            return isValid;
-        }
 
-        // Place order
-        async function placeOrder() {
-            if (!validateForm()) {
-                showAlert('Please fill in all required fields', 'danger');
+            if (!isValid) {
+                showPaymentStatus('Please fill in all required delivery information', 'error');
                 return;
             }
+
+            // Update progress bar
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+
+            // Show payment section
+            document.getElementById('deliverySection').style.display = 'none';
+            document.getElementById('paymentSection').style.display = 'block';
+        }
+
+        function selectPaymentMethod(method) {
+            // Remove previous selection
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.remove('selected');
+            });
             
-            const btn = document.getElementById('placeOrderBtn');
-            const spinner = btn.querySelector('.loading-spinner');
+            // Add selection to clicked method
+            event.currentTarget.classList.add('selected');
+            document.querySelector(`input[value="${method}"]`).checked = true;
+
+            // Hide all payment details
+            document.querySelectorAll('.payment-details').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show relevant payment details
+            const detailsId = method + '_details';
+            const detailsElement = document.getElementById(detailsId);
+            if (detailsElement) {
+                detailsElement.classList.add('active');
+            }
+        }
+
+        async function initiateSTKPush() {
+            const phoneNumber = document.getElementById('mpesa_phone').value;
+            const totalAmount = document.getElementById('totalAmount').textContent.replace('KES ', '');
+
+            if (!phoneNumber) {
+                showPaymentStatus('Please enter your M-Pesa phone number', 'error');
+                return;
+            }
+
+            // First, create the order
+            const orderResult = await createOrder('mpesa_stk');
+            if (!orderResult.success) {
+                showPaymentStatus(orderResult.error, 'error');
+                return;
+            }
+
+            currentOrder = orderResult.order;
+
+            // Show loading with STK push message
+            document.getElementById('paymentLoading').classList.add('active');
+            const loadingText = document.querySelector('#paymentLoading p');
+            loadingText.textContent = 'Sending STK Push to your phone...';
+            hidePaymentStatus();
             
-            btn.disabled = true;
-            spinner.style.display = 'inline-block';
-            
+            // Update button states
+            document.getElementById('stkPushBtn').disabled = true;
+            document.getElementById('stkPushBtn').style.display = 'none';
+            document.getElementById('stkCancelBtn').style.display = 'block';
+
             try {
-                const orderData = {
-                    customer_name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
-                    customer_email: document.getElementById('email').value,
-                    customer_phone: document.getElementById('phone').value,
-                    items: cartItems,
-                    subtotal: subtotal,
-                    delivery_fee: deliveryFee,
-                    total: totalAmount,
-                    delivery: {
-                        county: selectedCountyName,
-                        county_key: selectedCountyKey,
-                        town: selectedCityName,
-                        point: document.getElementById('deliveryPoint').value,
-                        method: document.querySelector('input[name="deliveryMethod"]:checked').value,
-                        time: document.getElementById('deliveryTime').value,
-                        instructions: document.getElementById('deliveryInstructions').value
+                const response = await fetch('/api/mpesa/initiate-stk/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
                     },
-                    payment_method: document.querySelector('input[name="paymentMethod"]:checked').value,
-                    payment_details: getPaymentDetails()
-                };
-                
+                    body: JSON.stringify({
+                        phone: phoneNumber,
+                        amount: totalAmount,
+                        order_id: currentOrder.order_id
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update loading message to indicate waiting for user response
+                    loadingText.textContent = 'STK Push sent! Please check your phone and enter your PIN to complete payment...';
+                    showPaymentStatus('STK Push sent successfully! Please check your phone and enter your PIN.', 'info');
+                    
+                    // Start polling for payment status
+                    startPaymentPolling(currentOrder.order_id);
+                } else {
+                    document.getElementById('paymentLoading').classList.remove('active');
+                    showPaymentStatus(result.error || 'Failed to send STK Push', 'error');
+                    resetSTKButtons();
+                }
+            } catch (error) {
+                document.getElementById('paymentLoading').classList.remove('active');
+                showPaymentStatus('Network error. Please try again.', 'error');
+                resetSTKButtons();
+            }
+        }
+
+        function cancelSTKPush() {
+            // Stop polling
+            if (paymentPollingInterval) {
+                clearInterval(paymentPollingInterval);
+                paymentPollingInterval = null;
+            }
+            
+            // Hide loading
+            document.getElementById('paymentLoading').classList.remove('active');
+            
+            // Show cancellation message
+            showPaymentStatus('Payment process cancelled. You can try again if needed.', 'error');
+            
+            // Reset buttons
+            resetSTKButtons();
+        }
+        
+        function resetSTKButtons() {
+            document.getElementById('stkPushBtn').disabled = false;
+            document.getElementById('stkPushBtn').style.display = 'block';
+            document.getElementById('stkCancelBtn').style.display = 'none';
+        }
+
+        async function verifyTransactionCode() {
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            const transactionCodeInput = document.getElementById(paymentMethod + '_transaction_code');
+            const transactionCode = transactionCodeInput.value;
+
+            if (!transactionCode) {
+                showPaymentStatus('Please enter the M-Pesa transaction code', 'error');
+                return;
+            }
+
+            if (!currentOrder) {
+                // Create order first if not already created
+                const orderResult = await createOrder(paymentMethod);
+                if (!orderResult.success) {
+                    showPaymentStatus(orderResult.error, 'error');
+                    return;
+                }
+                currentOrder = orderResult.order;
+            }
+
+            document.getElementById('paymentLoading').classList.add('active');
+            hidePaymentStatus();
+
+            try {
+                const response = await fetch('/api/mpesa/verify-transaction/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        order_id: currentOrder.order_id,
+                        transaction_code: transactionCode,
+                        phone_number: document.getElementById('customer_phone').value
+                    })
+                });
+
+                const result = await response.json();
+                document.getElementById('paymentLoading').classList.remove('active');
+
+                if (result.success) {
+                    showPaymentStatus('Payment verified successfully! Your order has been confirmed.', 'success');
+                    showOrderConfirmation(currentOrder, result);
+                } else {
+                    showPaymentStatus(result.error || 'Transaction verification failed', 'error');
+                }
+            } catch (error) {
+                document.getElementById('paymentLoading').classList.remove('active');
+                showPaymentStatus('Network error. Please try again.', 'error');
+            }
+        }
+
+        async function placeOrder() {
+            const orderResult = await createOrder('cod');
+            if (orderResult.success) {
+                showPaymentStatus('Order placed successfully! You will pay on delivery.', 'success');
+                showOrderConfirmation(orderResult.order, { message: 'Pay on delivery' });
+            } else {
+                showPaymentStatus(orderResult.error, 'error');
+            }
+        }
+
+        async function createOrder(paymentMethod) {
+            console.log('Creating order with payment method:', paymentMethod);
+            const formData = new FormData(document.getElementById('checkoutForm'));
+            
+            // Use the processed cart items from loadCartData
+            const cartItems = window.processedCartItems || JSON.parse(localStorage.getItem('cart') || '[]');
+            console.log('Cart items for order:', cartItems);
+            
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('KES ', ''));
+            const deliveryFee = parseFloat(document.getElementById('deliveryFee').textContent.replace('KES ', ''));
+            const totalAmount = subtotal + deliveryFee;
+
+            const orderData = {
+                customer_name: formData.get('customer_name'),
+                customer_email: formData.get('customer_email'),
+                customer_phone: formData.get('customer_phone'),
+                delivery_county: formData.get('delivery_county'),
+                delivery_town: formData.get('delivery_town'),
+                delivery_method: formData.get('delivery_method'),
+                payment_method: paymentMethod,
+                items: cartItems,
+                subtotal: subtotal,
+                delivery_fee: deliveryFee,
+                total_amount: totalAmount
+            };
+            
+            console.log('Order data:', orderData);
+
+            try {
                 const response = await fetch('/api/orders/create/', {
                     method: 'POST',
                     headers: {
@@ -1179,57 +1144,124 @@
                     },
                     body: JSON.stringify(orderData)
                 });
-                
+
                 const result = await response.json();
-                
-                if (result.success) {
-                    // Clear cart
-                    localStorage.setItem('zetumart_cart_v1', '[]');
-                    
-                    // Show success message
-                    showAlert(`Order placed successfully! Order ID: ${result.order_id}`, 'success');
-                    
-                    // Redirect to order confirmation page
-                    setTimeout(() => {
-                        window.location.href = `/order-confirmation/${result.order_id}/`;
-                    }, 2000);
-                } else {
-                    showAlert(result.error || 'Failed to place order', 'danger');
-                }
+                return result;
             } catch (error) {
-                console.error('Order error:', error);
-                showAlert('Failed to place order. Please try again.', 'danger');
-            } finally {
-                btn.disabled = false;
-                spinner.style.display = 'none';
+                return { success: false, error: 'Network error while creating order' };
             }
         }
 
-        // Get payment details based on selected method
-        function getPaymentDetails() {
-            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
-            const details = {};
+        function startPaymentPolling(orderId) {
+            let pollCount = 0;
+            const maxPolls = 60; // Maximum 5 minutes (60 * 5 seconds)
             
-            switch(method) {
-                case 'mpesa':
-                    details.phone = document.getElementById('mpesaPhone')?.value;
-                    break;
-                case 'till':
-                    details.transaction_code = document.getElementById('transactionCode')?.value;
-                    break;
-                case 'polepole':
-                    details.installment_plan = document.getElementById('installmentPlan')?.value;
-                    break;
-                case 'card':
-                    details.card_number = document.getElementById('cardNumber')?.value;
-                    details.expiry_date = document.getElementById('expiryDate')?.value;
-                    break;
-            }
-            
-            return details;
+            paymentPollingInterval = setInterval(async () => {
+                pollCount++;
+                
+                try {
+                    const response = await fetch(`/api/mpesa/check-payment/?order_id=${orderId}`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Check for successful payment
+                        if (result.order_status === 'paid' || result.payment_status === 'completed' || result.transaction_status === 'completed') {
+                            clearInterval(paymentPollingInterval);
+                            document.getElementById('paymentLoading').classList.remove('active');
+                            showPaymentStatus('Payment confirmed! Your order has been processed.', 'success');
+                            showOrderConfirmation(currentOrder, result);
+                            resetSTKButtons();
+                        } 
+                        // Check for cancelled payment
+                        else if (result.order_status === 'cancelled' || result.payment_status === 'failed' || result.transaction_status === 'cancelled' || result.result_code === '1032') {
+                            clearInterval(paymentPollingInterval);
+                            document.getElementById('paymentLoading').classList.remove('active');
+                            showPaymentStatus('Payment was cancelled. You can try again if needed.', 'error');
+                            resetSTKButtons();
+                        }
+                        // Check for failed payment
+                        else if (result.order_status === 'failed' || result.payment_status === 'failed' || result.transaction_status === 'failed') {
+                            clearInterval(paymentPollingInterval);
+                            document.getElementById('paymentLoading').classList.remove('active');
+                            showPaymentStatus('Payment failed. Please try again.', 'error');
+                            resetSTKButtons();
+                        }
+                        // Still pending - continue polling
+                        else {
+                            console.log('Payment still pending:', result);
+                        }
+                    }
+                    
+                    // Stop polling after maximum attempts
+                    if (pollCount >= maxPolls) {
+                        clearInterval(paymentPollingInterval);
+                        document.getElementById('paymentLoading').classList.remove('active');
+                        showPaymentStatus('Payment verification timed out. Please check your M-Pesa messages or contact support.', 'error');
+                        resetSTKButtons();
+                    }
+                } catch (error) {
+                    console.error('Error polling payment status:', error);
+                    if (pollCount >= maxPolls) {
+                        clearInterval(paymentPollingInterval);
+                        document.getElementById('paymentLoading').classList.remove('active');
+                        showPaymentStatus('Connection error during payment verification. Please check your order status.', 'error');
+                        resetSTKButtons();
+                    }
+                }
+            }, 5000); // Poll every 5 seconds
         }
 
-        // Get CSRF token
+        function showOrderConfirmation(order, paymentResult) {
+            // Update progress bar
+            document.getElementById('step2').classList.add('completed');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.add('active', 'completed');
+
+            // Hide payment section and show confirmation
+            document.getElementById('paymentSection').style.display = 'none';
+            document.getElementById('orderConfirmation').style.display = 'block';
+
+            const confirmationHTML = `
+                <div style="text-align: center;">
+                    <h3 style="color: #27ae60; margin-bottom: 20px;">🎉 Order Placed Successfully!</h3>
+                    <p><strong>Order ID:</strong> ${order.order_id}</p>
+                    <p><strong>Payment Method:</strong> ${getPaymentMethodName(order.payment_method)}</p>
+                    <p><strong>Total Amount:</strong> KES ${order.total_amount}</p>
+                    <p><strong>Delivery Location:</strong> ${order.delivery_town}, ${order.delivery_county}</p>
+                    ${paymentResult.receipt_number ? `<p><strong>Receipt Number:</strong> ${paymentResult.receipt_number}</p>` : ''}
+                    <p style="margin-top: 20px; color: #666;">You will receive an email confirmation shortly.</p>
+                    <button class="btn btn-primary" style="margin-top: 20px;" onclick="window.location.href='/'">Continue Shopping</button>
+                </div>
+            `;
+
+            document.getElementById('confirmationDetails').innerHTML = confirmationHTML;
+
+            // Clear cart
+            localStorage.removeItem('cart');
+        }
+
+        function getPaymentMethodName(method) {
+            const methods = {
+                'mpesa_stk': 'M-Pesa STK Push',
+                'mpesa_paybill': 'M-Pesa Paybill',
+                'mpesa_till': 'M-Pesa Till',
+                'mpesa_pochi': 'M-Pesa Pochi',
+                'cod': 'Pay on Delivery'
+            };
+            return methods[method] || method;
+        }
+
+        function showPaymentStatus(message, type) {
+            const statusElement = document.getElementById('paymentStatus');
+            statusElement.textContent = message;
+            statusElement.className = `payment-status ${type} active`;
+        }
+
+        function hidePaymentStatus() {
+            const statusElement = document.getElementById('paymentStatus');
+            statusElement.classList.remove('active');
+        }
+
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -1245,30 +1277,13 @@
             return cookieValue;
         }
 
-        // Format card number input
-        document.addEventListener('input', function(e) {
-            if (e.target && e.target.id === 'cardNumber') {
-                let value = e.target.value.replace(/\s/g, '');
-                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-                e.target.value = formattedValue;
-            }
+        // Auto-populate user data if logged in
+        window.addEventListener('load', function() {
+            // This would typically come from Django template context
+            // For now, we'll leave it empty
         });
-
-        // Format expiry date input
-        document.addEventListener('input', function(e) {
-            if (e.target && e.target.id === 'expiryDate') {
-                let value = e.target.value.replace(/\D/g, '');
-                if (value.length >= 2) {
-                    value = value.slice(0, 2) + '/' + value.slice(2, 4);
-                }
-                e.target.value = value;
-            }
-        });
-
-        // Go back to shop function
-        function goBack() {
-            window.location.href = '/';
-        }
     </script>
+    </div>
+    </div>
 </body>
 </html>

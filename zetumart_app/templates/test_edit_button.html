@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Edit Button</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <h1>Test Edit Button Functionality</h1>
+    
+    <button onclick="testEditButton()">Test Edit Product 33</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        function testEditButton() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<h2>Testing Edit Button...</h2>';
+            
+            // This is the EXACT same function from products.html
+            fetch(`/api/products/33/`, {
+                credentials: 'same-origin'
+            })
+                .then(response => {
+                    resultDiv.innerHTML += '<p>Response status: ' + response.status + '</p>';
+                    
+                    if (!response.ok) {
+                        if (response.status === 403) {
+                            throw new Error('403 Unauthorized - Authentication required');
+                        } else if (response.status === 401) {
+                            throw new Error('401 Unauthorized - Please login');
+                        } else {
+                            throw new Error(`Network response was not ok: ${response.status}`);
+                        }
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    resultDiv.innerHTML += '<p>Response data: ' + JSON.stringify(data, null, 2) + '</p>';
+                    
+                    if (data.success) {
+                        const product = data.product;
+                        resultDiv.innerHTML += '<h3>✅ SUCCESS: Product loaded!</h3>';
+                        resultDiv.innerHTML += '<p>Product ID: ' + product.id + '</p>';
+                        resultDiv.innerHTML += '<p>Product Name: ' + product.name + '</p>';
+                        resultDiv.innerHTML += '<p>Product Price: ' + product.price + '</p>';
+                        resultDiv.innerHTML += '<p>This proves the edit functionality works when authenticated!</p>';
+                    } else {
+                        resultDiv.innerHTML += '<h3>❌ Error loading product: ' + (data.error || 'Unknown error') + '</h3>';
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML += '<h3>❌ CATCH BLOCK ERROR</h3>';
+                    resultDiv.innerHTML += '<p>Error: ' + error.message + '</p>';
+                    
+                    if (error.message.includes('403') || error.message.includes('Unauthorized')) {
+                        resultDiv.innerHTML += '<p>🔐 Authentication required. Please login to edit products.</p>';
+                        resultDiv.innerHTML += '<p><a href="/login/">Click here to login</a></p>';
+                    } else {
+                        resultDiv.innerHTML += '<p>This is the exact error you see in the admin dashboard!</p>';
+                    }
+                    
+                    console.error('Error loading product:', error);
+                });
+        }
+    </script>
+</body>
+</html>

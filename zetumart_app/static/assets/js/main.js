@@ -500,20 +500,12 @@
       }
     }
 
-    // Auth helpers
-    function getUser(){ try { return JSON.parse(localStorage.getItem('zetumart_user')||'null'); } catch { return null; } }
+    // Auth helpers - Django handles authentication
+    function getUser(){ return null; } // Disabled - use Django auth
     function logout(){ 
-    // Get current user before clearing
-    const currentUser = getUser(); 
-    localStorage.removeItem('zetumart_user'); 
-    localStorage.removeItem('zetumart_is_admin'); 
-    // Clear current user's cart when logging out
-    if (currentUser && currentUser.email) {
-      const userCartKey = `zetumart_cart_${currentUser.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
-      localStorage.setItem(userCartKey, '[]');
+      // Use Django logout instead of client-side
+      window.location.href = '/logout/';
     }
-    location.reload(); 
-  }
 
     function updateNavAuth(){
       const user = getUser();
@@ -693,7 +685,7 @@
     const total = items.reduce((s,it)=> s + (it.price||0)*(it.qty||1), 0) + selectedDeliveryFee();
     let orders = [];
     try { orders = JSON.parse(localStorage.getItem('zm_orders_v1')||'[]'); } catch { orders = []; }
-    let user = null; try { user = JSON.parse(localStorage.getItem('zetumart_user')||'null'); } catch {}
+    let user = null; // Disabled - use Django auth instead
     const id = 'ORD-' + Math.random().toString(36).slice(2,8).toUpperCase();
     orders.push({ id, date: new Date().toISOString(), items, total, customer: user, paymentMethod: paymentMeta.method, paymentStatus: paymentMeta.status, shippingStatus: 'Pending' });
     localStorage.setItem('zm_orders_v1', JSON.stringify(orders));
@@ -847,54 +839,6 @@
   document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.querySelector('body.login-page .php-email-form, body .php-email-form#loginForm');
     const registerForm = document.querySelector('body.register-page .php-email-form, body .php-email-form#registerForm');
-    function afterAuth() {
-      const params = new URLSearchParams(location.search);
-      const ret = params.get('return') || '/';
-      window.location.href = ret;
-    }
-    if (loginForm) {
-      loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const emailOrUser = loginForm.querySelector('input[name="email"]')?.value || '';
-        const pass = loginForm.querySelector('input[name="password"]')?.value || '';
-        // Admin login: Username "admin" and Password "root" -> redirect to admin page
-        if (emailOrUser.trim().toLowerCase() === 'admin' && pass === 'root') {
-          localStorage.setItem('zetumart_user', JSON.stringify({ email: 'admin@zetumart', name: 'Admin' }));
-          localStorage.setItem('zetumart_is_admin', 'true');
-          window.location.href = 'admin.html';
-          return;
-        }
-        localStorage.setItem('zetumart_user', JSON.stringify({ email: emailOrUser }));
-        // ensure user exists in users store
-        try {
-          const key = 'zm_users_v1';
-          const users = JSON.parse(localStorage.getItem(key)||'[]');
-          const id = (emailOrUser||'').toLowerCase();
-          if (id && !users.find(u=> (u.email||'').toLowerCase()===id)) {
-            users.push({ id: 'U-'+Math.random().toString(36).slice(2,8), email: emailOrUser, name: emailOrUser.split('@')[0]||'User', blocked: false });
-            localStorage.setItem(key, JSON.stringify(users));
-          }
-        } catch {}
-        localStorage.removeItem('zetumart_is_admin');
-        afterAuth();
-      });
-    }
-    if (registerForm) {
-      registerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = registerForm.querySelector('input[name="email"]')?.value || '';
-        const name = registerForm.querySelector('input[name="name"]')?.value || '';
-        localStorage.setItem('zetumart_user', JSON.stringify({ email, name }));
-        try {
-          const key = 'zm_users_v1';
-          const users = JSON.parse(localStorage.getItem(key)||'[]');
-          if (email && !users.find(u=> (u.email||'').toLowerCase()===email.toLowerCase())) {
-            users.push({ id: 'U-'+Math.random().toString(36).slice(2,8), email, name, blocked: false });
-            localStorage.setItem(key, JSON.stringify(users));
-          }
-        } catch {}
-        afterAuth();
-      });
-    }
+    // Authentication handled by Django backend - remove client-side auth logic
   });
 })();

@@ -1,0 +1,451 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <!-- Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ZetuMart Admin Dashboard - Elements">
+    <meta name="keywords" content="bootstrap, admin, dashboard, template, modern, responsive">
+    <meta name="author" content="ZetuMart Admin">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="ZetuMart Admin - Elements">
+    <meta property="og:description" content="UI Components Showcase - Clean and modern admin dashboard template built with Bootstrap 5">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'Bootstrap-Admin-Template/dist-modern/assets/icons/favicon.svg' %}">
+    <link rel="icon" type="image/png" href="{% static 'Bootstrap-Admin-Template/dist-modern/assets/icons/favicon.png' %}">
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Title -->
+    <title>ZetuMart Admin - Elements</title>
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#6366f1">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{% static 'Bootstrap-Admin-Template/dist-modern/assets/manifest-DTaoG9pG.json' %}">
+    
+    <!-- Your Metis CSS and JS -->
+    <script type="module" crossorigin src="{% static 'Bootstrap-Admin-Template/dist-modern/assets/vendor-bootstrap-C9iorZI5.js' %}"></script>
+    <script type="module" crossorigin src="{% static 'Bootstrap-Admin-Template/dist-modern/assets/vendor-charts-DGwYAWel.js' %}"></script>
+    <script type="module" crossorigin src="{% static 'Bootstrap-Admin-Template/dist-modern/assets/vendor-ui-CflGdlft.js' %}"></script>
+    <script type="module" crossorigin src="{% static 'Bootstrap-Admin-Template/dist-modern/assets/main-B24LRf0x.js' %}"></script>
+    <link rel="stylesheet" crossorigin href="{% static 'Bootstrap-Admin-Template/dist-modern/assets/main-BQhM7myw.css' %}">
+</head>
+
+<body data-page="elements" class="admin-layout">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Wrapper -->
+    <div class="admin-wrapper" id="admin-wrapper">
+        
+        <!-- Header -->
+        <header class="admin-header">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+                <div class="container-fluid">
+                    <!-- Logo/Brand -->
+                    <a class="navbar-brand d-flex align-items-center" href="#">
+                        <img src="{% static 'Bootstrap-Admin-Template/dist-modern/assets/images/logo.svg' %}" alt="Logo" height="32" class="d-inline-block align-text-top me-2">
+                        <h1 class="h4 mb-0 fw-bold text-primary">ZetuMart</h1>
+                    </a>
+
+                    <!-- Sidebar Toggle -->
+                    <button class="hamburger-menu" type="button" data-sidebar-toggle aria-label="Toggle sidebar">
+                        <i class="bi bi-list"></i>
+                    </button>
+
+                    <!-- Search Bar -->
+                    <div class="search-container flex-grow-1 mx-4">
+                        <div class="position-relative">
+                            <input type="search" 
+                                   class="form-control" 
+                                   placeholder="Search elements... (Ctrl+K)"
+                                   aria-label="Search">
+                            <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-3"></i>
+                        </div>
+                    </div>
+
+                    <!-- Right Side Icons -->
+                    <div class="navbar-nav flex-row">
+                        <!-- Notifications -->
+                        <div class="dropdown me-2">
+                            <button class="btn btn-outline-secondary position-relative" 
+                                    type="button" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false">
+                                <i class="bi bi-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    3
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><h6 class="dropdown-header">Notifications</h6></li>
+                                <li><a class="dropdown-item" href="#">New user registered</a></li>
+                                <li><a class="dropdown-item" href="#">Server status update</a></li>
+                                <li><a class="dropdown-item" href="#">New message received</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-center" href="#">View all notifications</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- User Menu -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary d-flex align-items-center" 
+                                    type="button" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false">
+                                <img src="{% static 'Bootstrap-Admin-Template/dist-modern/assets/images/avatar-placeholder.svg' %}" 
+                                     alt="User Avatar" 
+                                     width="24" 
+                                     height="24" 
+                                     class="rounded-circle me-2">
+                                <span class="d-none d-md-inline">{{ user.get_full_name|default:user.username }}</span>
+                                <i class="bi bi-chevron-down ms-1"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="admin-sidebar">
+            <div class="sidebar-content">
+                <nav class="sidebar-nav">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_dashboard' %}">
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_order_management' %}">
+                                <i class="bi bi-bag-check"></i>
+                                <span>Orders</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'products' %}">
+                                <i class="bi bi-box"></i>
+                                <span>Products</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_user_management' %}">
+                                <i class="bi bi-people"></i>
+                                <span>Users</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_message_management' %}">
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Messages</span>
+                                <span class="badge bg-danger rounded-pill ms-auto">3</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'admin_elements' %}">
+                                <i class="bi bi-puzzle"></i>
+                                <span>Elements</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_reports' %}">
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Reports</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_calendar' %}">
+                                <i class="bi bi-calendar-event"></i>
+                                <span>Calendar</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_files' %}">
+                                <i class="bi bi-folder2-open"></i>
+                                <span>Files</span>
+                            </a>
+                        </li>
+                        <li class="nav-item mt-3">
+                            <small class="text-muted px-3 text-uppercase fw-bold">Admin</small>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin_settings' %}">
+                                <i class="bi bi-gear"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="container-fluid p-4">
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="h3 mb-1">UI Elements</h1>
+                        <p class="text-muted mb-0">Complete set of UI components and elements for your admin dashboard</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Buttons Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Buttons</h5>
+                            </div>
+                            <div class="card-body">
+                                <h6>Basic Buttons</h6>
+                                <div class="d-flex gap-2 mb-3">
+                                    <button class="btn btn-primary">Primary</button>
+                                    <button class="btn btn-secondary">Secondary</button>
+                                    <button class="btn btn-success">Success</button>
+                                    <button class="btn btn-danger">Danger</button>
+                                    <button class="btn btn-warning">Warning</button>
+                                    <button class="btn btn-info">Info</button>
+                                    <button class="btn btn-light">Light</button>
+                                    <button class="btn btn-dark">Dark</button>
+                                </div>
+                                
+                                <h6>Outline Buttons</h6>
+                                <div class="d-flex gap-2 mb-3">
+                                    <button class="btn btn-outline-primary">Primary</button>
+                                    <button class="btn btn-outline-secondary">Secondary</button>
+                                    <button class="btn btn-outline-success">Success</button>
+                                    <button class="btn btn-outline-danger">Danger</button>
+                                    <button class="btn btn-outline-warning">Warning</button>
+                                    <button class="btn btn-outline-info">Info</button>
+                                    <button class="btn btn-outline-light">Light</button>
+                                    <button class="btn btn-outline-dark">Dark</button>
+                                </div>
+                                
+                                <h6>Button Sizes</h6>
+                                <div class="d-flex gap-2 mb-3 align-items-center">
+                                    <button class="btn btn-primary btn-lg">Large</button>
+                                    <button class="btn btn-primary">Default</button>
+                                    <button class="btn btn-primary btn-sm">Small</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alerts Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Alerts</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-primary" role="alert">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    This is a primary alert with <a href="#" class="alert-link">an example link</a>.
+                                </div>
+                                <div class="alert alert-secondary" role="alert">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    This is a secondary alert with <a href="#" class="alert-link">an example link</a>.
+                                </div>
+                                <div class="alert alert-success" role="alert">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    This is a success alert with <a href="#" class="alert-link">an example link</a>.
+                                </div>
+                                <div class="alert alert-danger" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    This is a danger alert with <a href="#" class="alert-link">an example link</a>.
+                                </div>
+                                <div class="alert alert-warning" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    This is a warning alert with <a href="#" class="alert-link">an example link</a>.
+                                </div>
+                                <div class="alert alert-info" role="alert">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    This is an info alert with <a href="#" class="alert-link">an example link</a>.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Badges Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Badges</h5>
+                            </div>
+                            <div class="card-body">
+                                <h6>Contextual Badges</h6>
+                                <div class="d-flex gap-2 mb-3">
+                                    <span class="badge bg-primary">Primary</span>
+                                    <span class="badge bg-secondary">Secondary</span>
+                                    <span class="badge bg-success">Success</span>
+                                    <span class="badge bg-danger">Danger</span>
+                                    <span class="badge bg-warning text-dark">Warning</span>
+                                    <span class="badge bg-info">Info</span>
+                                    <span class="badge bg-light text-dark">Light</span>
+                                    <span class="badge bg-dark">Dark</span>
+                                </div>
+                                
+                                <h6>Pill Badges</h6>
+                                <div class="d-flex gap-2 mb-3">
+                                    <span class="badge rounded-pill bg-primary">Primary</span>
+                                    <span class="badge rounded-pill bg-secondary">Secondary</span>
+                                    <span class="badge rounded-pill bg-success">Success</span>
+                                    <span class="badge rounded-pill bg-danger">Danger</span>
+                                    <span class="badge rounded-pill bg-warning text-dark">Warning</span>
+                                    <span class="badge rounded-pill bg-info">Info</span>
+                                    <span class="badge rounded-pill bg-light text-dark">Light</span>
+                                    <span class="badge rounded-pill bg-dark">Dark</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cards Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Cards</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Card title</h5>
+                                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                                <a href="#" class="btn btn-primary">Go somewhere</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                Featured
+                                            </div>
+                                            <div class="card-body">
+                                                <h5 class="card-title">Special title treatment</h5>
+                                                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                                                <a href="#" class="btn btn-primary">Go somewhere</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Center card</h5>
+                                                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                                                <a href="#" class="btn btn-primary">Go somewhere</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tables Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Tables</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>First Name</th>
+                                                <th>Last Name</th>
+                                                <th>Username</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>Mark</td>
+                                                <td>Otto</td>
+                                                <td>@mdo</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>Jacob</td>
+                                                <td>Thornton</td>
+                                                <td>@fat</td>
+                                                <td><span class="badge bg-warning">Pending</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>3</td>
+                                                <td>Larry</td>
+                                                <td>Bird</td>
+                                                <td>@twitter</td>
+                                                <td><span class="badge bg-danger">Inactive</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Edit</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</body>
+</html>

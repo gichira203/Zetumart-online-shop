@@ -8,7 +8,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.core.mail import send_mail
-from django.db.models import Q
+from django.db.models import Q, Sum
+from django.conf import settings
+from django.template.loader import render_to_string
 import json
 import datetime
 import openpyxl
@@ -16,8 +18,9 @@ from openpyxl.styles import Font, PatternFill
 from docx import Document
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from .models import Product, Category, Order, ChatMessage, OrderTracking, AdminUser, UserProfile, CustomerCareMessage, Notification
-from .payment_services import PaymentProcessor
+from .models import Product, Category, Order, ChatMessage, OrderTracking, AdminUser, UserProfile, CustomerCareMessage, Notification, PaymentTransaction
+from .payment_services import PaymentProcessor, MpesaPaymentService
+from .mpesa_service import MpesaService
 from .delivery_data import get_county_list, search_counties, get_cities_for_county, search_cities, get_delivery_info, calculate_delivery_fee, get_estimated_delivery_date
 import io
 
@@ -41,10 +44,36 @@ def admin_dashboard(request):
     # Get all users with their profiles
     users = User.objects.all().select_related('userprofile').order_by('-date_joined')
     
+    # Get all products with their categories
+    products = Product.objects.all().select_related('category').order_by('-created_at')
+    
+    # Get all categories
+    categories = Category.objects.all().order_by('name')
+    
+    # Get all orders
+    orders = Order.objects.all().order_by('-created_at')
+    
+    # Get orders statistics
+    total_orders = Order.objects.count()
+    pending_orders = Order.objects.filter(order_status='pending').count()
+    completed_orders = Order.objects.filter(order_status='delivered').count()
+    
+    # Calculate total revenue
+    total_revenue = Order.objects.aggregate(
+        total=Sum('total_amount')
+    )['total'] or 0
+    
     context = {
         'users': users,
+        'products': products,
+        'categories': categories,
+        'orders': orders,
+        'total_orders': total_orders,
+        'pending_orders': pending_orders,
+        'completed_orders': completed_orders,
+        'total_revenue': total_revenue,
     }
-    return render(request, 'admin.html', context)
+    return render(request, 'admin_dashboard.html', context)
 
 def login_view(request):
     if request.method == 'POST':
@@ -53,30 +82,41 @@ def login_view(request):
         
         # Check for admin credentials
         if username == 'admin' and password == 'root':
-            # Create or get admin user
-            user, created = User.objects.get_or_create(
-                username='admin',
-                defaults={'is_staff': True, 'is_superuser': True}
-            )
-            if created:
-                user.set_password('root')
-                user.save()
-            
-            # Authenticate and login
-            user = authenticate(request, username='admin', password='root')
-            if user:
-                login(request, user)
-                return redirect('admin')
+            try:
+                # Create or get admin user
+                user, created = User.objects.get_or_create(
+                    username='admin',
+                    defaults={'is_staff': True, 'is_superuser': True}
+                )
+                if created:
+                    user.set_password('root')
+                    user.save()
+                
+                # Authenticate and login
+                user = authenticate(request, username='admin', password='root')
+                if user:
+                    login(request, user)
+                    messages.success(request, f'Welcome back, {user.username}!')
+                    return redirect('admin_dashboard')
+                else:
+                    messages.error(request, 'Authentication failed')
+            except Exception as e:
+                messages.error(request, f'Login error: {str(e)}')
         
         # Regular user authentication (for future use)
-        user = authenticate(request, username=username, password=password)
-        if user:
-            login(request, user)
-            return redirect('index')
         else:
-            messages.error(request, 'Invalid credentials')
+            user = authenticate(request, username=username, password=password)
+            if user:
+                login(request, user)
+                return redirect('index')
+            else:
+                messages.error(request, 'Invalid credentials')
     
-    return render(request, 'login.html')
+    # For GET requests, just show the login page
+    from django.middleware.csrf import get_token
+    csrf_token = get_token(request)
+    context = {'csrf_token': csrf_token}
+    return render(request, 'login.html', context)
 
 def register_view(request):
     if request.method == 'POST':
@@ -266,131 +306,6 @@ def notifications_view(request):
         'notifications': notifications_list
     }
     return render(request, 'notifications.html', context)
-
-def admin_dashboard_view(request):
-    if not request.user.is_staff:
-        return redirect('index')
-    
-    # Create sample orders if none exist (for testing)
-    if Order.objects.count() == 0:
-        create_sample_orders()
-    
-    users_list = User.objects.all()
-    messages_list = CustomerCareMessage.objects.all().order_by('-created_at')
-    orders_list = Order.objects.all().order_by('-created_at')
-    
-    # Create default categories if they don't exist
-    default_categories = ['Electronics', 'Fashion', 'Shoes', 'Home & Garden', 'Sports', 'Books', 'Toys', 'Beauty']
-    for cat_name in default_categories:
-        Category.objects.get_or_create(name=cat_name)
-    
-    categories_list = Category.objects.all()
-    
-    # Calculate statistics
-    replied_count = messages_list.filter(is_replied=True).count()
-    pending_count = messages_list.filter(is_replied=False).count()
-    
-    # Serialize messages for JavaScript
-    messages_data = []
-    for msg in messages_list:
-        messages_data.append({
-            'id': msg.id,
-            'message': msg.message,
-            'reply': msg.reply,
-            'is_replied': msg.is_replied,
-            'created_at': msg.created_at.isoformat(),
-            'replied_at': msg.replied_at.isoformat() if msg.replied_at else None,
-            'user': {
-                'first_name': msg.user.first_name,
-                'last_name': msg.user.last_name
-            } if msg.user else None,
-            'name': msg.name,
-            'email': msg.email
-        })
-    
-    # Serialize orders for JavaScript - FIX THIS PART
-    orders_data = []
-    for order in orders_list:
-        orders_data.append({
-            'id': order.id,
-            'order_id': order.order_id,
-            'customer_name': order.customer_name,
-            'customer_email': order.customer_email,
-            'customer_phone': order.customer_phone,
-            'total_amount': float(order.total_amount),
-            'payment_method': order.get_payment_method_display(),
-            'payment_status': order.get_payment_status_display(),
-            'order_status': order.get_order_status_display(),
-            'delivery_status': order.get_delivery_status_display(),
-            'created_at': order.created_at.strftime('%Y-%m-%d %H:%M'),
-            'delivery_county': order.delivery_county,
-            'delivery_town': order.delivery_town
-        })
-    
-    context = {
-        'users': users_list,
-        'messages': messages_list,
-        'messages_json': json.dumps(messages_data),
-        'orders': orders_list,
-        'orders_json': json.dumps(orders_data),
-        'categories': categories_list,
-        'products': Product.objects.all().select_related('category').order_by('-created_at'),
-        'replied_count': replied_count,
-        'pending_count': pending_count,
-    }
-    return render(request, 'admin_dashboard.html', context)
-
-def create_sample_orders():
-    """Create sample orders for testing the dashboard"""
-    import random
-    from datetime import datetime, timedelta
-    
-    sample_customers = [
-        {'name': 'John Doe', 'email': 'john@example.com', 'phone': '0712345678'},
-        {'name': 'Jane Smith', 'email': 'jane@example.com', 'phone': '0723456789'},
-        {'name': 'Bob Johnson', 'email': 'bob@example.com', 'phone': '0734567890'},
-        {'name': 'Alice Brown', 'email': 'alice@example.com', 'phone': '0745678901'},
-        {'name': 'Charlie Wilson', 'email': 'charlie@example.com', 'phone': '0756789012'}
-    ]
-    
-    counties = ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret']
-    towns = ['Nairobi CBD', 'Mombasa Town', 'Kisumu Central', 'Nakuru Town', 'Eldoret Town']
-    statuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']
-    payment_methods = ['mpesa', 'till', 'cod', 'card']
-    payment_statuses = ['pending', 'completed', 'failed']
-    
-    for i in range(10):
-        customer = random.choice(sample_customers)
-        county = random.choice(counties)
-        town = random.choice(towns)
-        status = random.choice(statuses)
-        payment_method = random.choice(payment_methods)
-        payment_status = random.choice(payment_statuses)
-        
-        # Generate random date within last 30 days
-        days_ago = random.randint(0, 30)
-        created_date = timezone.now() - timedelta(days=days_ago)
-        
-        Order.objects.create(
-            order_id=f'ORD-{1000 + i}',
-            customer_name=customer['name'],
-            customer_email=customer['email'],
-            customer_phone=customer['phone'],
-            items=[{'name': f'Product {i+1}', 'quantity': random.randint(1, 3), 'price': random.uniform(1000, 10000)}],
-            subtotal=random.uniform(1000, 10000),
-            delivery_fee=random.uniform(100, 500),
-            total_amount=random.uniform(1100, 10500),
-            delivery_county=county,
-            delivery_town=town,
-            delivery_point=f'{town}, {county}',
-            delivery_method=random.choice(['home', 'office', 'pickup']),
-            delivery_time=random.choice(['anytime', 'morning', 'afternoon', 'evening']),
-            payment_method=payment_method,
-            payment_status=payment_status,
-            order_status=status,
-            delivery_status=random.choice(['pending', 'preparing', 'out_for_delivery', 'delivered']),
-            created_at=created_date
-        )
 
 @csrf_exempt
 @login_required
@@ -614,308 +529,13 @@ def export_users_word(request):
     doc.save(response)
     return response
 
-@login_required
-def admin_user_management(request):
-    if not request.user.is_superuser:
-        return JsonResponse({'error': 'Superuser access required'}, status=403)
-    
-    if request.method == 'GET':
-        users = User.objects.all().prefetch_related('userprofile')
-        users_data = []
-        
-        for user in users:
-            try:
-                profile = user.userprofile
-            except UserProfile.DoesNotExist:
-                profile = None
-                
-            users_data.append({
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'is_active': user.is_active,
-                'is_staff': user.is_staff,
-                'is_superuser': user.is_superuser,
-                'date_joined': user.date_joined.strftime('%Y-%m-%d %H:%M:%S'),
-                'last_login': user.last_login.strftime('%Y-%m-%d %H:%M:%S') if user.last_login else 'Never',
-                'phone': profile.phone if profile else '',
-                'address': profile.address if profile else '',
-                'profile_picture': profile.profile_picture.url if profile and profile.profile_picture else None,
-                'password_hash': user.password,  # For superuser viewing only
-            })
-        
-        return JsonResponse({'users': users_data})
-    
-    elif request.method == 'POST':
-        action = request.POST.get('action')
-        
-        if action == 'delete_user':
-            user_id = request.POST.get('user_id')
-            user = get_object_or_404(User, id=user_id)
-            if user.is_superuser:
-                return JsonResponse({'error': 'Cannot delete superuser'}, status=400)
-            user.delete()
-            return JsonResponse({'success': True, 'message': 'User deleted successfully'})
-        
-        elif action == 'toggle_status':
-            user_id = request.POST.get('user_id')
-            user = get_object_or_404(User, id=user_id)
-            user.is_active = not user.is_active
-            user.save()
-            status = 'activated' if user.is_active else 'deactivated'
-            return JsonResponse({'success': True, 'message': f'User {status} successfully'})
-        
-        elif action == 'make_staff':
-            user_id = request.POST.get('user_id')
-            user = get_object_or_404(User, id=user_id)
-            user.is_staff = not user.is_staff
-            user.save()
-            status = 'grprogrammed as staff' if user.is_staff else 'removed from staff'
-            return JsonResponse({'success': True, 'message': f'User {status} successfully'})
-        
-        elif action == 'reset_password':
-            user_id = request.POST.get('user_id')
-            new_password = request.POST.get('new_password')
-            user = get_object_or_404(User, id=user_id)
-            user.set_password(new_password)
-            user.save()
-            return JsonResponse({'success': True, 'message': 'Password reset successfully'})
-    
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-@login_required
-def admin_product_management(request):
-    if not request.user.is_superuser:
-        return JsonResponse({'error': 'Superuser access required'}, status=403)
-    
-    if request.method == 'POST':
-        action = request.POST.get('action')
-        product_id = request.POST.get('product_id')
-        
-        if action == 'delete_product':
-            product = get_object_or_404(Product, id=product_id)
-            product.delete()
-            return JsonResponse({'success': True, 'message': 'Product deleted successfully'})
-        
-        elif action == 'toggle_status':
-            product = get_object_or_404(Product, id=product_id)
-            product.status = 'inactive' if product.status == 'active' else 'active'
-            product.save()
-            status = 'activated' if product.status == 'active' else 'deactivated'
-            return JsonResponse({'success': True, 'message': f'Product {status} successfully'})
-    
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-@login_required
-def admin_message_management(request):
-    if not request.user.is_superuser:
-        return JsonResponse({'error': 'Superuser access required'}, status=403)
-    
-    if request.method == 'POST':
-        action = request.POST.get('action')
-        message_id = request.POST.get('message_id')
-        
-        if action == 'delete_message':
-            message = get_object_or_404(CustomerCareMessage, id=message_id)
-            message.delete()
-            return JsonResponse({'success': True, 'message': 'Message deleted successfully'})
-        
-        elif action == 'mark_resolved':
-            message = get_object_or_404(CustomerCareMessage, id=message_id)
-            message.is_replied = True
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=users_data.pdf'
-    
-    p = canvas.Canvas(response)
-    p.setFont("Helvetica", 16)
-    p.drawString(100, 800, "ZetuMart Users Data")
-    
-    y_position = 750
-    p.setFont("Helvetica", 12)
-    
-    for user in users:
-        if y_position < 100:
-            p.showPage()
-            y_position = 750
-            
-        try:
-            profile = UserProfile.objects.get(user=user)
-            user_data = [
-                f"Username: {user.username}",
-                f"Name: {user.first_name} {user.last_name}",
-                f"Email: {user.email}",
-                f"Joined: {user.date_joined.strftime('%Y-%m-%d')}",
-                f"Phone: {profile.phone or 'Not provided'}",
-                f"Address: {profile.address or 'Not provided'}"
-            ]
-        except UserProfile.DoesNotExist:
-            user_data = [
-                f"Username: {user.username}",
-                f"Name: {user.first_name} {user.last_name}",
-                f"Email: {user.email}",
-                f"Joined: {user.date_joined.strftime('%Y-%m-%d')}",
-                f"Phone: Not provided",
-                f"Address: Not provided"
-            ]
-        
-        for data in user_data:
-            p.drawString(100, y_position, data)
-            y_position -= 20
-        
-        y_position -= 10
-    
-    p.save()
-    return response
-
 @csrf_exempt
-@login_required
-def admin_message_management(request):
-    if not request.user.is_superuser:
-        return JsonResponse({'error': 'Superuser access required'}, status=403)
-    
-    if request.method == 'POST':
-        action = request.POST.get('action')
-        message_id = request.POST.get('message_id')
-        
-        if action == 'delete_message':
-            message = get_object_or_404(CustomerCareMessage, id=message_id)
-            message.delete()
-            return JsonResponse({'success': True, 'message': 'Message deleted successfully'})
-        
-        elif action == 'mark_resolved':
-            message = get_object_or_404(CustomerCareMessage, id=message_id)
-            message.is_replied = True
-            message.replied_at = timezone.now()
-            message.save()
-            return JsonResponse({'success': True, 'message': 'Message marked as resolved'})
-        
-        elif action == 'bulk_delete':
-            message_ids = request.POST.getlist('message_ids[]')
-            CustomerCareMessage.objects.filter(id__in=message_ids).delete()
-            return JsonResponse({'success': True, 'message': f'{len(message_ids)} messages deleted successfully'})
-    
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-def export_users_pdf(request):
-    if not request.user.is_staff:
-        return redirect('login')
-    
-    users = User.objects.all()
-    
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=users_data.pdf'
-    
-    p = canvas.Canvas(response)
-    p.setFont("Helvetica", 16)
-    p.drawString(100, 800, "ZetuMart Users Data")
-    
-    y_position = 750
-    p.setFont("Helvetica", 12)
-    
-    for user in users:
-        if y_position < 100:
-            p.showPage()
-            y_position = 750
-            
-        try:
-            profile = UserProfile.objects.get(user=user)
-            user_data = [
-                f"Username: {user.username}",
-                f"Name: {user.first_name} {user.last_name}",
-                f"Email: {user.email}",
-                f"Joined: {user.date_joined.strftime('%Y-%m-%d')}",
-                f"Phone: {profile.phone or 'Not provided'}",
-                f"Address: {profile.address or 'Not provided'}"
-            ]
-        except UserProfile.DoesNotExist:
-            user_data = [
-                f"Username: {user.username}",
-                f"Name: {user.first_name} {user.last_name}",
-                f"Email: {user.email}",
-                f"Joined: {user.date_joined.strftime('%Y-%m-%d')}",
-                f"Phone: Not provided",
-                f"Address: Not provided"
-            ]
-        
-        for data in user_data:
-            p.drawString(100, y_position, data)
-            y_position -= 20
-        
-        y_position -= 10
-    
-    p.save()
-    return response
-
-@csrf_exempt
-@login_required
-def add_admin_user(request):
-    if not request.user.is_superuser:
-        return JsonResponse({'error': 'Superuser access required'}, status=403)
-    
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        first_name = request.POST.get('first_name', '')
-        last_name = request.POST.get('last_name', '')
-        password = request.POST.get('password')
-        
-        if not username or not email or not password:
-            return JsonResponse({'error': 'Username, email, and password are required'}, status=400)
-        
-        try:
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password,
-                first_name=first_name,
-                last_name=last_name,
-                is_staff=True
-            )
-            return JsonResponse({'success': True, 'message': 'Admin user created successfully'})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-    
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-@csrf_exempt
-@login_required
-def delete_user(request, user_id):
-    if not request.user.is_staff:
-        return JsonResponse({'error': 'Unauthorized'}, status=403)
-    
-    user = get_object_or_404(User, id=user_id)
-    
-    if request.method == 'DELETE':
-        if user.is_superuser:
-            return JsonResponse({'error': 'Cannot delete superuser'}, status=400)
-        user.delete()
-        return JsonResponse({'success': True, 'message': 'User deleted successfully'})
-    
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-@csrf_exempt
-@login_required
-def delete_message(request, message_id):
-    if not request.user.is_staff:
-        return JsonResponse({'error': 'Unauthorized'}, status=403)
-    
-    message = get_object_or_404(CustomerCareMessage, id=message_id)
-    
-    if request.method == 'DELETE':
-        message.delete()
-        return JsonResponse({'success': True, 'message': 'Message deleted successfully'})
-    
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-@csrf_exempt
-@login_required
 def add_product(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     
-    if not request.user.is_staff:
+    # Check if user is authenticated and staff
+    if not request.user.is_authenticated or not request.user.is_staff:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
     try:
@@ -1003,9 +623,9 @@ def add_product(request):
         return JsonResponse({'error': f'Error adding product: {str(e)}'}, status=400)
 
 @csrf_exempt
-@login_required
 def get_products(request):
-    if not request.user.is_staff:
+    # Check if user is authenticated and staff
+    if not request.user.is_authenticated or not request.user.is_staff:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
     products = Product.objects.all().select_related('category')
@@ -1028,9 +648,9 @@ def get_products(request):
     return JsonResponse({'products': products_data})
 
 @csrf_exempt
-@login_required
 def get_product(request, product_id):
-    if not request.user.is_staff:
+    # Check if user is authenticated and staff
+    if not request.user.is_authenticated or not request.user.is_staff:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
     try:
@@ -1051,26 +671,37 @@ def get_product(request, product_id):
         return JsonResponse({'error': 'Product not found'}, status=404)
 
 @csrf_exempt
-@login_required
 def update_product(request, product_id):
-    if not request.user.is_staff:
+    # Check if user is authenticated and staff
+    if not request.user.is_authenticated or not request.user.is_staff:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
-    if request.method != 'PUT':
+    if request.method not in ['PUT', 'POST']:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     
     try:
         product = Product.objects.get(id=product_id)
         
+        # Handle both PUT and POST requests for better compatibility
+        if request.method == 'PUT':
+            # For PUT requests, parse the multipart form data
+            from django.http import QueryDict
+            if request.content_type.startswith('multipart/form-data'):
+                put_data = QueryDict(request.body)
+            else:
+                put_data = request.POST
+        else:
+            put_data = request.POST
+        
         # Update product fields
-        product.name = request.POST.get('name', product.name)
-        product.price = request.POST.get('price', product.price)
-        product.stock = request.POST.get('stock', product.stock)
-        product.description = request.POST.get('description', product.description)
-        product.status = request.POST.get('status', product.status)
+        product.name = put_data.get('name', product.name)
+        product.price = put_data.get('price', product.price)
+        product.stock = put_data.get('stock', product.stock)
+        product.description = put_data.get('description', product.description)
+        product.status = put_data.get('status', product.status)
         
         # Update category if provided
-        category_id = request.POST.get('category')
+        category_id = put_data.get('category')
         if category_id:
             category = Category.objects.get(id=category_id)
             product.category = category
@@ -1092,9 +723,9 @@ def update_product(request, product_id):
         return JsonResponse({'error': str(e)}, status=400)
 
 @csrf_exempt
-@login_required
 def delete_product_view(request, product_id):
-    if not request.user.is_staff:
+    # Check if user is authenticated and staff
+    if not request.user.is_authenticated or not request.user.is_staff:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
     if request.method != 'DELETE':
@@ -1107,8 +738,12 @@ def delete_product_view(request, product_id):
     except Product.DoesNotExist:
         return JsonResponse({'error': 'Product not found'}, status=404)
 
+@login_required
 def products_view(request):
-    products = Product.objects.filter(status='active').select_related('category')
+    if not request.user.is_staff:
+        return redirect('admin_dashboard')
+    
+    products = Product.objects.all().select_related('category')
     categories = Category.objects.all()
     
     context = {
@@ -1118,18 +753,34 @@ def products_view(request):
     return render(request, 'products.html', context)
 
 def shop_category_view(request):
-    products = Product.objects.filter(status='active').select_related('category')
+    # Show ALL products from admin dashboard - complete integration
+    products = Product.objects.all().select_related('category').order_by('-created_at')
     categories = Category.objects.all()
     
-    category_id = request.GET.get('category')
-    if category_id:
-        products = products.filter(category_id=category_id)
+    # Debug: Print to console
+    print(f"=== SHOP DEBUG ===")
+    print(f"Total products found: {products.count()}")
+    print(f"Categories found: {categories.count()}")
+    for product in products[:3]:
+        print(f"Product: {product.name} - Status: {product.status} - Category: {product.category.name if product.category else 'None'}")
+    
+    # Get data for stats
+    users = User.objects.all()
+    orders = Order.objects.all()
+    
+    category_name = request.GET.get('category')
+    if category_name and category_name != 'all':
+        products = products.filter(category__name=category_name)
+        print(f"Filtered by category '{category_name}': {products.count()} products")
     
     context = {
         'products': products,
         'categories': categories,
-        'selected_category': category_id
+        'selected_category': category_name,
+        'users': users,
+        'orders': orders
     }
+    print(f"Context sent to template: {len(context['products'])} products")
     return render(request, 'shop.html', context)
 
 @csrf_exempt
@@ -1146,7 +797,6 @@ def get_categories(request):
     return JsonResponse({'categories': categories_data})
 
 @csrf_exempt
-@login_required
 def create_order(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid request method'}, status=405)
@@ -1161,16 +811,40 @@ def create_order(request):
             customer_phone=data.get('customer_phone'),
             delivery_county=data.get('delivery_county'),
             delivery_town=data.get('delivery_town'),
-            delivery_address=data.get('delivery_address'),
-            total_amount=data.get('total_amount'),
+            delivery_point=f"{data.get('delivery_town', '')}, {data.get('delivery_county', '')}",  # Auto-generate from town and county
+            delivery_method=data.get('delivery_method'),
+            delivery_time=data.get('delivery_time', 'anytime'),  # Default to anytime
+            delivery_instructions=data.get('delivery_instructions', ''),  # Default to empty
             payment_method=data.get('payment_method'),
+            items=data.get('items', []),
+            subtotal=data.get('subtotal', 0),
+            delivery_fee=data.get('delivery_fee', 0),
+            total_amount=data.get('total_amount'),
             order_status='pending',
             payment_status='pending'
         )
         
+        # Create order tracking
+        OrderTracking.objects.create(
+            order=order,
+            status='Order Created',
+            description=f'Order {order.order_id} created with {data.get("payment_method", "unknown")} payment method',
+            location='Order System'
+        )
+        
         return JsonResponse({
             'success': True,
-            'order_id': order.order_id,
+            'order': {
+                'order_id': order.order_id,
+                'total_amount': float(order.total_amount),
+                'payment_method': order.payment_method,
+                'customer_name': order.customer_name,
+                'customer_email': order.customer_email,
+                'customer_phone': order.customer_phone,
+                'delivery_point': order.delivery_point,
+                'delivery_town': order.delivery_town,
+                'delivery_county': order.delivery_county
+            },
             'message': 'Order created successfully'
         })
     
@@ -1180,7 +854,6 @@ def create_order(request):
         return JsonResponse({'error': str(e)}, status=400)
 
 @csrf_exempt
-@login_required
 def get_orders(request):
     if not request.user.is_staff:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
@@ -1336,52 +1009,53 @@ def reply_to_chat_message(request, message_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
 
-def checkout_view(request):
-    if request.method == 'POST':
-        # Handle checkout form submission
-        customer_name = request.POST.get('customer_name')
-        customer_email = request.POST.get('customer_email')
-        customer_phone = request.POST.get('customer_phone')
-        delivery_county = request.POST.get('delivery_county')
-        delivery_town = request.POST.get('delivery_town')
-        delivery_address = request.POST.get('delivery_address')
-        payment_method = request.POST.get('payment_method')
-        total_amount = request.POST.get('total_amount')
-        
-        try:
-            order = Order.objects.create(
-                customer_name=customer_name,
-                customer_email=customer_email,
-                customer_phone=customer_phone,
-                delivery_county=delivery_county,
-                delivery_town=delivery_town,
-                delivery_address=delivery_address,
-                payment_method=payment_method,
-                total_amount=total_amount,
-                order_status='pending',
-                payment_status='pending'
-            )
-            
-            return JsonResponse({
-                'success': True,
-                'order_id': order.order_id,
-                'message': 'Order placed successfully!'
-            })
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
+def cart_view(request):
+    """
+    Display the shopping cart page
+    """
+    # Get unread notifications count
+    unread_notifications = 0
+    if request.user.is_authenticated:
+        unread_notifications = Notification.objects.filter(user=request.user, is_read=False).count()
     
-    # GET request - show checkout page
-    return render(request, 'checkout.html')
+    context = {
+        'unread_notifications': unread_notifications,
+    }
+    return render(request, 'cart.html', context)
 
-def order_confirmation_view(request, order_id):
-    try:
-        order = get_object_or_404(Order, order_id=order_id)
-        context = {
-            'order': order
-        }
-        return render(request, 'order_confirmation.html', context)
-    except Exception as e:
-        return render(request, 'error.html', {'error': 'Order not found'})
+def checkout_view(request):
+    """
+    Display the checkout page
+    """
+    # Get unread notifications count
+    unread_notifications = 0
+    if request.user.is_authenticated:
+        unread_notifications = Notification.objects.filter(user=request.user, is_read=False).count()
+    
+    # Pre-fill user data if logged in
+    user_data = {}
+    if request.user.is_authenticated:
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+            user_data = {
+                'customer_name': request.user.get_full_name() or request.user.username,
+                'customer_email': request.user.email,
+                'customer_phone': user_profile.phone or '',
+            }
+        except UserProfile.DoesNotExist:
+            user_data = {
+                'customer_name': request.user.get_full_name() or request.user.username,
+                'customer_email': request.user.email,
+                'customer_phone': '',
+            }
+    
+    context = {
+        'unread_notifications': unread_notifications,
+        'user_data': user_data,
+    }
+    return render(request, 'checkout.html', context)
+
+
 
 @csrf_exempt
 @login_required
@@ -1437,37 +1111,65 @@ def get_payment_status(request, order_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
 
-def payment_success_view(request):
-    order_id = request.GET.get('order_id')
-    if not order_id:
-        return render(request, 'error.html', {'error': 'Order ID not provided'})
-    
-    try:
-        order = get_object_or_404(Order, order_id=order_id)
-        context = {
-            'order': order
-        }
-        return render(request, 'payment_success.html', context)
-    except Exception as e:
-        return render(request, 'error.html', {'error': 'Order not found'})
 
-def payment_cancel_view(request):
-    order_id = request.GET.get('order_id')
-    if not order_id:
-        return render(request, 'error.html', {'error': 'Order ID not provided'})
-    
+
+@require_POST
+@csrf_exempt
+def initiate_stk_push(request):
+    """Initiate M-Pesa STK Push payment"""
     try:
-        order = get_object_or_404(Order, order_id=order_id)
-        # Update order status to cancelled
-        order.order_status = 'cancelled'
-        order.save()
+        data = json.loads(request.body)
+        phone_number = data.get('phone')
+        amount = data.get('amount')
+        order_id = data.get('order_id')
         
-        context = {
-            'order': order
-        }
-        return render(request, 'payment_cancel.html', context)
+        # Validate inputs
+        if not phone_number or not amount or not order_id:
+            return JsonResponse({
+                'success': False,
+                'error': 'Missing required fields'
+            }, status=400)
+        
+        # Get order
+        try:
+            order = Order.objects.get(order_id=order_id)
+        except Order.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': 'Order not found'
+            }, status=404)
+        
+        # Initialize M-Pesa service
+        mpesa_service = MpesaService()
+        
+        # Initiate STK push
+        result = mpesa_service.stk_push_request(
+            phone_number=phone_number,
+            amount=amount,
+            order_id=order_id,
+            account_reference=f"ZETUMART-{order_id}"
+        )
+        
+        if result['success']:
+            # Update order status
+            order.payment_status = 'pending'
+            order.order_status = 'awaiting_payment'
+            order.save()
+            
+            # Create order tracking
+            OrderTracking.objects.create(
+                order=order,
+                status='Payment Initiated',
+                description=f'M-Pesa STK Push sent to {phone_number} for KES {amount}',
+                location='Payment System'
+            )
+        
+        return JsonResponse(result)
     except Exception as e:
-        return render(request, 'error.html', {'error': 'Order not found'})
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
 
 @csrf_exempt
 def mpesa_callback(request):
@@ -1479,31 +1181,235 @@ def mpesa_callback(request):
         # Parse M-Pesa callback data
         data = json.loads(request.body)
         
-        # Extract transaction details
-        transaction_id = data.get('trans_id')
-        order_id = data.get('order_id')
-        status = data.get('status')
+        # Initialize M-Pesa service
+        mpesa_service = MpesaService()
         
-        if not all([transaction_id, order_id, status]):
-            return JsonResponse({'error': 'Missing required fields'}, status=400)
+        # Process the callback
+        result = mpesa_service.process_callback(data)
         
-        # Find and update order
-        order = get_object_or_404(Order, order_id=order_id)
-        
-        if status == 'success':
-            order.payment_status = 'paid'
-            order.order_status = 'processing'
+        if result['success']:
+            return JsonResponse({'success': True, 'message': 'Callback processed successfully'})
         else:
-            order.payment_status = 'failed'
-        
-        order.save()
-        
-        return JsonResponse({'success': True, 'message': 'Callback processed successfully'})
+            return JsonResponse({'success': False, 'error': result.get('error', 'Callback processing failed')}, status=400)
     
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+
+@csrf_exempt
+def check_payment_status(request):
+    """Check M-Pesa payment status"""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+    try:
+        order_id = request.GET.get('order_id')
+        
+        if not order_id:
+            return JsonResponse({
+                'success': False,
+                'error': 'Missing order_id'
+            }, status=400)
+        
+        # Get order
+        try:
+            order = Order.objects.get(order_id=order_id)
+        except Order.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': 'Order not found'
+            }, status=404)
+        
+        # Get latest transaction
+        latest_transaction = order.payment_transactions.order_by('-created_at').first()
+        
+        if not latest_transaction:
+            return JsonResponse({
+                'success': False,
+                'error': 'No transaction found for this order'
+            }, status=404)
+        
+        # If transaction is still pending, check status
+        if latest_transaction.status == 'pending' and latest_transaction.checkout_request_id:
+            mpesa_service = MpesaService()
+            status_result = mpesa_service.transaction_status_query(latest_transaction.checkout_request_id)
+            
+            # Update transaction and order status based on query result
+            if status_result.get('ResponseCode') == '0':
+                result_code = status_result.get('ResultCode')
+                result_desc = status_result.get('ResultDesc', '')
+                
+                if result_code == '0':  # Success
+                    # Update transaction as completed
+                    latest_transaction.status = 'completed'
+                    latest_transaction.result_code = result_code
+                    latest_transaction.result_desc = result_desc
+                    latest_transaction.save()
+                    
+                    # Update order
+                    order.payment_status = 'completed'
+                    order.order_status = 'paid'
+                    order.save()
+                    
+                elif result_code == '1032':  # Cancelled by user
+                    # Update transaction as cancelled
+                    latest_transaction.status = 'cancelled'
+                    latest_transaction.result_code = result_code
+                    latest_transaction.result_desc = result_desc
+                    latest_transaction.save()
+                    
+                    # Update order
+                    order.payment_status = 'failed'
+                    order.order_status = 'cancelled'
+                    order.save()
+                    
+                else:  # Failed
+                    # Update transaction as failed
+                    latest_transaction.status = 'failed'
+                    latest_transaction.result_code = result_code
+                    latest_transaction.result_desc = result_desc
+                    latest_transaction.save()
+                    
+                    # Update order
+                    order.payment_status = 'failed'
+                    order.order_status = 'failed'
+                    order.save()
+            
+            return JsonResponse({
+                'success': True,
+                'order_status': order.order_status,
+                'payment_status': order.payment_status,
+                'transaction_status': latest_transaction.status,
+                'result_code': latest_transaction.result_code,
+                'result_desc': latest_transaction.result_desc,
+                'receipt_number': latest_transaction.receipt_number,
+                'checkout_request_id': latest_transaction.checkout_request_id,
+                'mpesa_query': status_result
+            })
+        else:
+            return JsonResponse({
+                'success': True,
+                'order_status': order.order_status,
+                'payment_status': order.payment_status,
+                'transaction_status': latest_transaction.status,
+                'result_code': latest_transaction.result_code,
+                'result_desc': latest_transaction.result_desc,
+                'receipt_number': latest_transaction.receipt_number,
+                'checkout_request_id': latest_transaction.checkout_request_id
+            })
+    
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+@require_POST
+@csrf_exempt
+def verify_transaction_code(request):
+    """Verify M-Pesa transaction code for Paybill/Till/Pochi payments"""
+    try:
+        data = json.loads(request.body)
+        order_id = data.get('order_id')
+        transaction_code = data.get('transaction_code')
+        phone_number = data.get('phone_number')
+        
+        if not all([order_id, transaction_code, phone_number]):
+            return JsonResponse({
+                'success': False,
+                'error': 'Missing required fields'
+            }, status=400)
+        
+        # Get order
+        try:
+            order = Order.objects.get(order_id=order_id)
+        except Order.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': 'Order not found'
+            }, status=404)
+        
+        # Check for duplicate transaction code
+        existing_transaction = PaymentTransaction.objects.filter(
+            transaction_id=transaction_code
+        ).first()
+        
+        if existing_transaction:
+            return JsonResponse({
+                'success': False,
+                'error': 'Transaction code has already been used'
+            }, status=400)
+        
+        # Initialize M-Pesa service
+        mpesa_service = MpesaService()
+        
+        # Verify transaction
+        verification_result = mpesa_service.verify_transaction_code(
+            transaction_code=transaction_code,
+            amount=float(order.total_amount),
+            phone_number=phone_number
+        )
+        
+        if verification_result['valid']:
+            # Create payment transaction record
+            transaction = PaymentTransaction.objects.create(
+                order=order,
+                transaction_type='paybill' if order.payment_method == 'mpesa_paybill' else 'till' if order.payment_method == 'mpesa_till' else 'pochi',
+                transaction_id=transaction_code,
+                phone_number=phone_number,
+                amount=order.total_amount,
+                receipt_number=verification_result.get('receipt_number'),
+                transaction_date=verification_result.get('transaction_date'),
+                status='completed',
+                result_code='0',
+                result_desc='Transaction verified successfully',
+                response_data=verification_result
+            )
+            
+            # Update order
+            order.payment_status = 'completed'
+            order.order_status = 'paid'
+            order.save()
+            
+            # Create order tracking
+            OrderTracking.objects.create(
+                order=order,
+                status='Payment Verified',
+                description=f'Transaction {transaction_code} verified successfully. Amount: KES {order.total_amount}',
+                location='M-Pesa System'
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Transaction verified successfully',
+                'receipt_number': verification_result.get('receipt_number'),
+                'amount': verification_result.get('amount')
+            })
+        else:
+            # Create failed transaction record
+            PaymentTransaction.objects.create(
+                order=order,
+                transaction_type='paybill' if order.payment_method == 'mpesa_paybill' else 'till' if order.payment_method == 'mpesa_till' else 'pochi',
+                transaction_id=transaction_code,
+                phone_number=phone_number,
+                amount=order.total_amount,
+                status='failed',
+                result_code='1',
+                result_desc=verification_result.get('error', 'Transaction verification failed'),
+                response_data=verification_result
+            )
+            
+            return JsonResponse({
+                'success': False,
+                'error': verification_result.get('error', 'Transaction verification failed')
+            }, status=400)
+    
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
 
 @csrf_exempt
 def api_search_counties(request):
@@ -1707,3 +1613,177 @@ def api_calculate_delivery_fee(request):
         'base_fee': base_fees.get(county, 500),
         'additional_fee': 200 if city in remote_cities else 0
     })
+
+
+# ============ PRODUCT MANAGEMENT VIEWS ============
+# (Removed - using main products page instead)
+
+def redirect_to_products(request):
+    """Redirect old admin products URL to main products page"""
+    return redirect('products')
+
+@login_required
+def admin_user_management(request):
+    """Display all users for admin management"""
+    if not request.user.is_staff:
+        return redirect('index')
+    
+    users = User.objects.all().order_by('-date_joined')
+    
+    context = {
+        'users': users,
+    }
+    return render(request, 'admin_user_management.html', context)
+
+@login_required
+def admin_order_management(request):
+    """Display all orders for admin management"""
+    if not request.user.is_staff:
+        return redirect('index')
+    
+    orders = Order.objects.all().order_by('-created_at')
+    
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'admin_order_management.html', context)
+
+@login_required
+def admin_message_management(request):
+    """Display all messages for admin management"""
+    if not request.user.is_staff:
+        return redirect('index')
+    
+    from .models import ContactMessage
+    messages = ContactMessage.objects.all().order_by('-created_at')
+    
+    context = {
+        'messages': messages,
+    }
+    return render(request, 'admin_message_management.html', context)
+
+@login_required
+def admin_reply_message(request, message_id):
+    """Reply to a message via AJAX"""
+    if not request.user.is_staff:
+        return JsonResponse({'success': False, 'error': 'Unauthorized'})
+    
+    if request.method == 'POST':
+        from .models import ContactMessage
+        message = get_object_or_404(ContactMessage, id=message_id)
+        reply_text = request.POST.get('reply', '')
+        
+        if reply_text.strip():
+            message.reply = reply_text
+            message.replied = True
+            message.replied_at = timezone.now()
+            message.save()
+            
+            # Here you could also send an email to the customer
+            # send_mail(
+            #     'Re: ' + message.subject,
+            #     reply_text,
+            #     settings.DEFAULT_FROM_EMAIL,
+            #     [message.email],
+            #     fail_silently=False,
+            # )
+            
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'error': 'Reply cannot be empty'})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@login_required
+def admin_mark_message_replied(request, message_id):
+    """Mark a message as replied"""
+    if not request.user.is_staff:
+        return redirect('index')
+    
+    from .models import ContactMessage
+    message = get_object_or_404(ContactMessage, id=message_id)
+    message.replied = True
+    message.replied_at = timezone.now()
+    message.save()
+    
+    messages.success(request, 'Message marked as replied!')
+    return redirect('admin_message_management')
+
+@login_required
+def admin_settings(request):
+    """Admin settings page"""
+    if not request.user.is_staff:
+        return redirect('index')
+    
+    return render(request, 'admin_settings.html', {})
+
+@login_required
+def admin_elements(request):
+    """Admin elements page - UI components showcase"""
+    if not request.user.is_staff:
+        return redirect('index')
+    
+    return render(request, 'admin_elements.html', {})
+
+@login_required
+def admin_reports(request):
+    """Admin reports page"""
+    if not request.user.is_staff:
+        return redirect('index')
+    
+    return render(request, 'admin_reports.html', {})
+
+@login_required
+def admin_calendar(request):
+    """Admin calendar page"""
+    if not request.user.is_staff:
+        return redirect('index')
+    
+    return render(request, 'admin_calendar.html', {})
+
+@csrf_exempt
+def api_products_details(request):
+    """API endpoint to fetch product details for checkout"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        product_ids = data.get('product_ids', [])
+        
+        if not product_ids:
+            return JsonResponse({'success': False, 'error': 'No product IDs provided'}, status=400)
+        
+        # Fetch products from database
+        products = Product.objects.filter(
+            id__in=product_ids,
+            status='active'
+        ).values('id', 'name', 'price', 'description', 'image')
+        
+        products_list = list(products)
+        
+        return JsonResponse({
+            'success': True,
+            'products': products_list
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON data'}, status=400)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+@login_required
+def admin_files(request):
+    """Admin files management page"""
+    if not request.user.is_staff:
+        return redirect('index')
+    
+    return render(request, 'admin_files.html', {})
+
+def test_edit_button(request):
+    """Test page for edit button functionality"""
+    return render(request, 'test_edit_button.html', {})
+
+def real_browser_test(request):
+    """Real browser authentication test"""
+    return render(request, 'real_browser_test.html', {})
